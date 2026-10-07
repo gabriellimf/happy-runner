@@ -1,0 +1,1605 @@
+{
+  "currently_playing": {
+    "album": {
+      "album_type": "single",
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/3qvcCP2J0fWi0m0uQDUf6r"
+          },
+          "href": "https://api.spotify.com/v1/artists/3qvcCP2J0fWi0m0uQDUf6r",
+          "id": "3qvcCP2J0fWi0m0uQDUf6r",
+          "name": "Luan Santana",
+          "type": "artist",
+          "uri": "spotify:artist:3qvcCP2J0fWi0m0uQDUf6r"
+        }
+      ],
+      "external_urls": {
+        "spotify": "https://open.spotify.com/album/4mQpXudi3KmfvZOgWLTi2g"
+      },
+      "href": "https://api.spotify.com/v1/albums/4mQpXudi3KmfvZOgWLTi2g",
+      "id": "4mQpXudi3KmfvZOgWLTi2g",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b2730cc35eea32bca2900fd69dea",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://i.scdn.co/image/ab67616d00001e020cc35eea32bca2900fd69dea",
+          "width": 300
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/ab67616d000048510cc35eea32bca2900fd69dea",
+          "width": 64
+        }
+      ],
+      "name": "THE COMEBACK",
+      "release_date": "2021-11-04",
+      "release_date_precision": "day",
+      "total_tracks": 4,
+      "type": "album",
+      "uri": "spotify:album:4mQpXudi3KmfvZOgWLTi2g"
+    },
+    "artists": [
+      {
+        "external_urls": {
+          "spotify": "https://open.spotify.com/artist/3qvcCP2J0fWi0m0uQDUf6r"
+        },
+        "href": "https://api.spotify.com/v1/artists/3qvcCP2J0fWi0m0uQDUf6r",
+        "id": "3qvcCP2J0fWi0m0uQDUf6r",
+        "name": "Luan Santana",
+        "type": "artist",
+        "uri": "spotify:artist:3qvcCP2J0fWi0m0uQDUf6r"
+      }
+    ],
+    "disc_number": 1,
+    "duration_ms": 182568,
+    "explicit": false,
+    "external_urls": {
+      "spotify": "https://open.spotify.com/track/2zvfMwpBdm9zC4zwLWq1Wg"
+    },
+    "href": "https://api.spotify.com/v1/tracks/2zvfMwpBdm9zC4zwLWq1Wg",
+    "id": "2zvfMwpBdm9zC4zwLWq1Wg",
+    "is_local": false,
+    "name": "ILHA",
+    "preview_url": null,
+    "track_number": 1,
+    "type": "track",
+    "uri": "spotify:track:2zvfMwpBdm9zC4zwLWq1Wg"
+  },
+  "queue": [
+    {
+      "album": {
+        "album_type": "single",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/5xYkM2vMrE23taj6tl7qkm"
+            },
+            "href": "https://api.spotify.com/v1/artists/5xYkM2vMrE23taj6tl7qkm",
+            "id": "5xYkM2vMrE23taj6tl7qkm",
+            "name": "Pk",
+            "type": "artist",
+            "uri": "spotify:artist:5xYkM2vMrE23taj6tl7qkm"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/4xZooRPlL4QKyM0twraCtp"
+        },
+        "href": "https://api.spotify.com/v1/albums/4xZooRPlL4QKyM0twraCtp",
+        "id": "4xZooRPlL4QKyM0twraCtp",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2733a209aacf2b60ae1053b22e6",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e023a209aacf2b60ae1053b22e6",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048513a209aacf2b60ae1053b22e6",
+            "width": 64
+          }
+        ],
+        "name": "Quando a vontade bater (Participação especial de PK Delas)",
+        "release_date": "2019-03-04",
+        "release_date_precision": "day",
+        "total_tracks": 1,
+        "type": "album",
+        "uri": "spotify:album:4xZooRPlL4QKyM0twraCtp"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5xYkM2vMrE23taj6tl7qkm"
+          },
+          "href": "https://api.spotify.com/v1/artists/5xYkM2vMrE23taj6tl7qkm",
+          "id": "5xYkM2vMrE23taj6tl7qkm",
+          "name": "Pk",
+          "type": "artist",
+          "uri": "spotify:artist:5xYkM2vMrE23taj6tl7qkm"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/6gqBZ0kAjgVLsZQKkHcaB3"
+          },
+          "href": "https://api.spotify.com/v1/artists/6gqBZ0kAjgVLsZQKkHcaB3",
+          "id": "6gqBZ0kAjgVLsZQKkHcaB3",
+          "name": "PK Delas",
+          "type": "artist",
+          "uri": "spotify:artist:6gqBZ0kAjgVLsZQKkHcaB3"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 166400,
+      "explicit": true,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/26WpOBpHiIMoBuMEIwtOCH"
+      },
+      "href": "https://api.spotify.com/v1/tracks/26WpOBpHiIMoBuMEIwtOCH",
+      "id": "26WpOBpHiIMoBuMEIwtOCH",
+      "is_local": false,
+      "name": "Quando a vontade bater (Participação especial de PK Delas)",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:26WpOBpHiIMoBuMEIwtOCH"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1elUiq4X7pxej6FRlrEzjM"
+            },
+            "href": "https://api.spotify.com/v1/artists/1elUiq4X7pxej6FRlrEzjM",
+            "id": "1elUiq4X7pxej6FRlrEzjM",
+            "name": "Jorge & Mateus",
+            "type": "artist",
+            "uri": "spotify:artist:1elUiq4X7pxej6FRlrEzjM"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/6nE1C92IIZQBnlYLxObRHW"
+        },
+        "href": "https://api.spotify.com/v1/albums/6nE1C92IIZQBnlYLxObRHW",
+        "id": "6nE1C92IIZQBnlYLxObRHW",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2737541a7dd6385ccb55185c2ce",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e027541a7dd6385ccb55185c2ce",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048517541a7dd6385ccb55185c2ce",
+            "width": 64
+          }
+        ],
+        "name": "Live In London - At The Royal Albert Hall (Ao Vivo)",
+        "release_date": "2013-11-25",
+        "release_date_precision": "day",
+        "total_tracks": 20,
+        "type": "album",
+        "uri": "spotify:album:6nE1C92IIZQBnlYLxObRHW"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1elUiq4X7pxej6FRlrEzjM"
+          },
+          "href": "https://api.spotify.com/v1/artists/1elUiq4X7pxej6FRlrEzjM",
+          "id": "1elUiq4X7pxej6FRlrEzjM",
+          "name": "Jorge & Mateus",
+          "type": "artist",
+          "uri": "spotify:artist:1elUiq4X7pxej6FRlrEzjM"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 324466,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/0bOqCHcUOMEDoDqYUL0PLW"
+      },
+      "href": "https://api.spotify.com/v1/tracks/0bOqCHcUOMEDoDqYUL0PLW",
+      "id": "0bOqCHcUOMEDoDqYUL0PLW",
+      "is_local": false,
+      "name": "A Hora É Agora - Ao Vivo",
+      "preview_url": null,
+      "track_number": 12,
+      "type": "track",
+      "uri": "spotify:track:0bOqCHcUOMEDoDqYUL0PLW"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/487N2T9nIPEHrlTZLL3SQs"
+            },
+            "href": "https://api.spotify.com/v1/artists/487N2T9nIPEHrlTZLL3SQs",
+            "id": "487N2T9nIPEHrlTZLL3SQs",
+            "name": "Zé Neto & Cristiano",
+            "type": "artist",
+            "uri": "spotify:artist:487N2T9nIPEHrlTZLL3SQs"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/7fF43JKZ1MTkFiWRzrkzcn"
+        },
+        "href": "https://api.spotify.com/v1/albums/7fF43JKZ1MTkFiWRzrkzcn",
+        "id": "7fF43JKZ1MTkFiWRzrkzcn",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273ede6a29e3b312fba44c9c8f9",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02ede6a29e3b312fba44c9c8f9",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851ede6a29e3b312fba44c9c8f9",
+            "width": 64
+          }
+        ],
+        "name": "Vocês & Deus (Ao Vivo no Rio de Janeiro)",
+        "release_date": "2026-09-03",
+        "release_date_precision": "day",
+        "total_tracks": 21,
+        "type": "album",
+        "uri": "spotify:album:7fF43JKZ1MTkFiWRzrkzcn"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/487N2T9nIPEHrlTZLL3SQs"
+          },
+          "href": "https://api.spotify.com/v1/artists/487N2T9nIPEHrlTZLL3SQs",
+          "id": "487N2T9nIPEHrlTZLL3SQs",
+          "name": "Zé Neto & Cristiano",
+          "type": "artist",
+          "uri": "spotify:artist:487N2T9nIPEHrlTZLL3SQs"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 160613,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/27BcWN9G2MxGBXvC0tEKkN"
+      },
+      "href": "https://api.spotify.com/v1/tracks/27BcWN9G2MxGBXvC0tEKkN",
+      "id": "27BcWN9G2MxGBXvC0tEKkN",
+      "is_local": false,
+      "name": "Cadeira Cativa - Ao Vivo",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:27BcWN9G2MxGBXvC0tEKkN"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6Wlvsn3IPHiZwAv02lB5eC"
+            },
+            "href": "https://api.spotify.com/v1/artists/6Wlvsn3IPHiZwAv02lB5eC",
+            "id": "6Wlvsn3IPHiZwAv02lB5eC",
+            "name": "Ícaro e Gilmar",
+            "type": "artist",
+            "uri": "spotify:artist:6Wlvsn3IPHiZwAv02lB5eC"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/55fTXDuYLyZlLyH5egTvJ5"
+        },
+        "href": "https://api.spotify.com/v1/albums/55fTXDuYLyZlLyH5egTvJ5",
+        "id": "55fTXDuYLyZlLyH5egTvJ5",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273667b7f360d04ba354415f162",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02667b7f360d04ba354415f162",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851667b7f360d04ba354415f162",
+            "width": 64
+          }
+        ],
+        "name": "Calopsia (Ao Vivo)",
+        "release_date": "2025-09-11",
+        "release_date_precision": "day",
+        "total_tracks": 12,
+        "type": "album",
+        "uri": "spotify:album:55fTXDuYLyZlLyH5egTvJ5"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/6Wlvsn3IPHiZwAv02lB5eC"
+          },
+          "href": "https://api.spotify.com/v1/artists/6Wlvsn3IPHiZwAv02lB5eC",
+          "id": "6Wlvsn3IPHiZwAv02lB5eC",
+          "name": "Ícaro e Gilmar",
+          "type": "artist",
+          "uri": "spotify:artist:6Wlvsn3IPHiZwAv02lB5eC"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 167709,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/2SIwiF7GORUriJKY9pG26a"
+      },
+      "href": "https://api.spotify.com/v1/tracks/2SIwiF7GORUriJKY9pG26a",
+      "id": "2SIwiF7GORUriJKY9pG26a",
+      "is_local": false,
+      "name": "Voltável - Ao Vivo",
+      "preview_url": null,
+      "track_number": 4,
+      "type": "track",
+      "uri": "spotify:track:2SIwiF7GORUriJKY9pG26a"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/5fWvTvWy2NCaVy8pFmWIvk"
+            },
+            "href": "https://api.spotify.com/v1/artists/5fWvTvWy2NCaVy8pFmWIvk",
+            "id": "5fWvTvWy2NCaVy8pFmWIvk",
+            "name": "Júnior e Cézar",
+            "type": "artist",
+            "uri": "spotify:artist:5fWvTvWy2NCaVy8pFmWIvk"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2kry3uCWQJ1CqXRrKMOlZ3"
+        },
+        "href": "https://api.spotify.com/v1/albums/2kry3uCWQJ1CqXRrKMOlZ3",
+        "id": "2kry3uCWQJ1CqXRrKMOlZ3",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27330bb06231508c9e35872895a",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0230bb06231508c9e35872895a",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485130bb06231508c9e35872895a",
+            "width": 64
+          }
+        ],
+        "name": "Daquele Jeitão (Ao Vivo)",
+        "release_date": "2026-09-17",
+        "release_date_precision": "day",
+        "total_tracks": 8,
+        "type": "album",
+        "uri": "spotify:album:2kry3uCWQJ1CqXRrKMOlZ3"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/5fWvTvWy2NCaVy8pFmWIvk"
+          },
+          "href": "https://api.spotify.com/v1/artists/5fWvTvWy2NCaVy8pFmWIvk",
+          "id": "5fWvTvWy2NCaVy8pFmWIvk",
+          "name": "Júnior e Cézar",
+          "type": "artist",
+          "uri": "spotify:artist:5fWvTvWy2NCaVy8pFmWIvk"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 161298,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/1JdG3r5dEOF9viojUqwX7W"
+      },
+      "href": "https://api.spotify.com/v1/tracks/1JdG3r5dEOF9viojUqwX7W",
+      "id": "1JdG3r5dEOF9viojUqwX7W",
+      "is_local": false,
+      "name": "Cheiro De Culpado - Ao Vivo",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:1JdG3r5dEOF9viojUqwX7W"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/2Z0lRIqr997lIUiPtrpKCr"
+            },
+            "href": "https://api.spotify.com/v1/artists/2Z0lRIqr997lIUiPtrpKCr",
+            "id": "2Z0lRIqr997lIUiPtrpKCr",
+            "name": "Matheus & Kauan",
+            "type": "artist",
+            "uri": "spotify:artist:2Z0lRIqr997lIUiPtrpKCr"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/1OkdRmcGgEGkotlkG1E9q2"
+        },
+        "href": "https://api.spotify.com/v1/albums/1OkdRmcGgEGkotlkG1E9q2",
+        "id": "1OkdRmcGgEGkotlkG1E9q2",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273525edab604386ce3fce89cc5",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02525edab604386ce3fce89cc5",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851525edab604386ce3fce89cc5",
+            "width": 64
+          }
+        ],
+        "name": "Envolvente (Ao Vivo / Vol.2)",
+        "release_date": "2025-03-14",
+        "release_date_precision": "day",
+        "total_tracks": 10,
+        "type": "album",
+        "uri": "spotify:album:1OkdRmcGgEGkotlkG1E9q2"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/2Z0lRIqr997lIUiPtrpKCr"
+          },
+          "href": "https://api.spotify.com/v1/artists/2Z0lRIqr997lIUiPtrpKCr",
+          "id": "2Z0lRIqr997lIUiPtrpKCr",
+          "name": "Matheus & Kauan",
+          "type": "artist",
+          "uri": "spotify:artist:2Z0lRIqr997lIUiPtrpKCr"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/2CKOmarVWvWqkNWUatHCex"
+          },
+          "href": "https://api.spotify.com/v1/artists/2CKOmarVWvWqkNWUatHCex",
+          "id": "2CKOmarVWvWqkNWUatHCex",
+          "name": "Ana Castela",
+          "type": "artist",
+          "uri": "spotify:artist:2CKOmarVWvWqkNWUatHCex"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 179504,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/44CTudFZ0kbaIF9n0jk7oU"
+      },
+      "href": "https://api.spotify.com/v1/tracks/44CTudFZ0kbaIF9n0jk7oU",
+      "id": "44CTudFZ0kbaIF9n0jk7oU",
+      "is_local": false,
+      "name": "Ilusão De Ótica - Ao Vivo",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:44CTudFZ0kbaIF9n0jk7oU"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1D6vAeVUcgMbSx80IA3Zun"
+            },
+            "href": "https://api.spotify.com/v1/artists/1D6vAeVUcgMbSx80IA3Zun",
+            "id": "1D6vAeVUcgMbSx80IA3Zun",
+            "name": "Henrique & Diego",
+            "type": "artist",
+            "uri": "spotify:artist:1D6vAeVUcgMbSx80IA3Zun"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2yqFE84Ne8JjDcEXhdi6qB"
+        },
+        "href": "https://api.spotify.com/v1/albums/2yqFE84Ne8JjDcEXhdi6qB",
+        "id": "2yqFE84Ne8JjDcEXhdi6qB",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2730f91729d8550f80bccccdd5a",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e020f91729d8550f80bccccdd5a",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048510f91729d8550f80bccccdd5a",
+            "width": 64
+          }
+        ],
+        "name": "Tempo Certo (Ao Vivo em Campo Grande)",
+        "release_date": "2015-02-03",
+        "release_date_precision": "day",
+        "total_tracks": 16,
+        "type": "album",
+        "uri": "spotify:album:2yqFE84Ne8JjDcEXhdi6qB"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1D6vAeVUcgMbSx80IA3Zun"
+          },
+          "href": "https://api.spotify.com/v1/artists/1D6vAeVUcgMbSx80IA3Zun",
+          "id": "1D6vAeVUcgMbSx80IA3Zun",
+          "name": "Henrique & Diego",
+          "type": "artist",
+          "uri": "spotify:artist:1D6vAeVUcgMbSx80IA3Zun"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/3ge4xOaKvWfhRwgx0Rldov"
+          },
+          "href": "https://api.spotify.com/v1/artists/3ge4xOaKvWfhRwgx0Rldov",
+          "id": "3ge4xOaKvWfhRwgx0Rldov",
+          "name": "MC Guimê",
+          "type": "artist",
+          "uri": "spotify:artist:3ge4xOaKvWfhRwgx0Rldov"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 178066,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/4lbPwb1Beo7JU2VwuJRTeR"
+      },
+      "href": "https://api.spotify.com/v1/tracks/4lbPwb1Beo7JU2VwuJRTeR",
+      "id": "4lbPwb1Beo7JU2VwuJRTeR",
+      "is_local": false,
+      "name": "Suíte 14 - Ao Vivo",
+      "preview_url": null,
+      "track_number": 2,
+      "type": "track",
+      "uri": "spotify:track:4lbPwb1Beo7JU2VwuJRTeR"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1elUiq4X7pxej6FRlrEzjM"
+            },
+            "href": "https://api.spotify.com/v1/artists/1elUiq4X7pxej6FRlrEzjM",
+            "id": "1elUiq4X7pxej6FRlrEzjM",
+            "name": "Jorge & Mateus",
+            "type": "artist",
+            "uri": "spotify:artist:1elUiq4X7pxej6FRlrEzjM"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0spzPH10djjrUshMB2z9jt"
+        },
+        "href": "https://api.spotify.com/v1/albums/0spzPH10djjrUshMB2z9jt",
+        "id": "0spzPH10djjrUshMB2z9jt",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2737ea581f6963d14d477207234",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e027ea581f6963d14d477207234",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048517ea581f6963d14d477207234",
+            "width": 64
+          }
+        ],
+        "name": "Os Anjos Cantam",
+        "release_date": "2015-03-23",
+        "release_date_precision": "day",
+        "total_tracks": 17,
+        "type": "album",
+        "uri": "spotify:album:0spzPH10djjrUshMB2z9jt"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1elUiq4X7pxej6FRlrEzjM"
+          },
+          "href": "https://api.spotify.com/v1/artists/1elUiq4X7pxej6FRlrEzjM",
+          "id": "1elUiq4X7pxej6FRlrEzjM",
+          "name": "Jorge & Mateus",
+          "type": "artist",
+          "uri": "spotify:artist:1elUiq4X7pxej6FRlrEzjM"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 187453,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/7evftBiobEwWOwfxiTnnKc"
+      },
+      "href": "https://api.spotify.com/v1/tracks/7evftBiobEwWOwfxiTnnKc",
+      "id": "7evftBiobEwWOwfxiTnnKc",
+      "is_local": false,
+      "name": "Calma",
+      "preview_url": null,
+      "track_number": 12,
+      "type": "track",
+      "uri": "spotify:track:7evftBiobEwWOwfxiTnnKc"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/3p7PcrEHaaKLJnPUGOtRlT"
+            },
+            "href": "https://api.spotify.com/v1/artists/3p7PcrEHaaKLJnPUGOtRlT",
+            "id": "3p7PcrEHaaKLJnPUGOtRlT",
+            "name": "Henrique & Juliano",
+            "type": "artist",
+            "uri": "spotify:artist:3p7PcrEHaaKLJnPUGOtRlT"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0srvWt9dxX3Wu3khPhQD3K"
+        },
+        "href": "https://api.spotify.com/v1/albums/0srvWt9dxX3Wu3khPhQD3K",
+        "id": "0srvWt9dxX3Wu3khPhQD3K",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2736f77a385515006e6af3558cd",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e026f77a385515006e6af3558cd",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048516f77a385515006e6af3558cd",
+            "width": 64
+          }
+        ],
+        "name": "Novas Histórias (Ao Vivo)",
+        "release_date": "2016-03-18",
+        "release_date_precision": "day",
+        "total_tracks": 14,
+        "type": "album",
+        "uri": "spotify:album:0srvWt9dxX3Wu3khPhQD3K"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/3p7PcrEHaaKLJnPUGOtRlT"
+          },
+          "href": "https://api.spotify.com/v1/artists/3p7PcrEHaaKLJnPUGOtRlT",
+          "id": "3p7PcrEHaaKLJnPUGOtRlT",
+          "name": "Henrique & Juliano",
+          "type": "artist",
+          "uri": "spotify:artist:3p7PcrEHaaKLJnPUGOtRlT"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 163913,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/3XLY1NoGu6RPGYaRjGX68T"
+      },
+      "href": "https://api.spotify.com/v1/tracks/3XLY1NoGu6RPGYaRjGX68T",
+      "id": "3XLY1NoGu6RPGYaRjGX68T",
+      "is_local": false,
+      "name": "Como É Que A Gente Fica - Ao Vivo",
+      "preview_url": null,
+      "track_number": 2,
+      "type": "track",
+      "uri": "spotify:track:3XLY1NoGu6RPGYaRjGX68T"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/7gZu6kPnY9enEi5FvgTO4F"
+            },
+            "href": "https://api.spotify.com/v1/artists/7gZu6kPnY9enEi5FvgTO4F",
+            "id": "7gZu6kPnY9enEi5FvgTO4F",
+            "name": "Felipe e Rodrigo",
+            "type": "artist",
+            "uri": "spotify:artist:7gZu6kPnY9enEi5FvgTO4F"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/6Zvp9WWJTWzonuuAM9vA3L"
+        },
+        "href": "https://api.spotify.com/v1/albums/6Zvp9WWJTWzonuuAM9vA3L",
+        "id": "6Zvp9WWJTWzonuuAM9vA3L",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273b335fa375ab39cf2bee69850",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02b335fa375ab39cf2bee69850",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851b335fa375ab39cf2bee69850",
+            "width": 64
+          }
+        ],
+        "name": "Velhos Hábitos, Vol. 2 (Ao Vivo)",
+        "release_date": "2026-03-26",
+        "release_date_precision": "day",
+        "total_tracks": 11,
+        "type": "album",
+        "uri": "spotify:album:6Zvp9WWJTWzonuuAM9vA3L"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/7gZu6kPnY9enEi5FvgTO4F"
+          },
+          "href": "https://api.spotify.com/v1/artists/7gZu6kPnY9enEi5FvgTO4F",
+          "id": "7gZu6kPnY9enEi5FvgTO4F",
+          "name": "Felipe e Rodrigo",
+          "type": "artist",
+          "uri": "spotify:artist:7gZu6kPnY9enEi5FvgTO4F"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 179215,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/7dNXSf4lS30n1lBfFavQK5"
+      },
+      "href": "https://api.spotify.com/v1/tracks/7dNXSf4lS30n1lBfFavQK5",
+      "id": "7dNXSf4lS30n1lBfFavQK5",
+      "is_local": false,
+      "name": "Ignora - Ao Vivo",
+      "preview_url": null,
+      "track_number": 3,
+      "type": "track",
+      "uri": "spotify:track:7dNXSf4lS30n1lBfFavQK5"
+    },
+    {
+      "album": {
+        "album_type": "single",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6xerOqBLmelL3xZNZkVbGl"
+            },
+            "href": "https://api.spotify.com/v1/artists/6xerOqBLmelL3xZNZkVbGl",
+            "id": "6xerOqBLmelL3xZNZkVbGl",
+            "name": "João Gustavo e Murilo",
+            "type": "artist",
+            "uri": "spotify:artist:6xerOqBLmelL3xZNZkVbGl"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1eIYP01ZLPKEExhcV6xFgt"
+            },
+            "href": "https://api.spotify.com/v1/artists/1eIYP01ZLPKEExhcV6xFgt",
+            "id": "1eIYP01ZLPKEExhcV6xFgt",
+            "name": "Grelo",
+            "type": "artist",
+            "uri": "spotify:artist:1eIYP01ZLPKEExhcV6xFgt"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/5LEVnXg3usIhjeS7HAadfs"
+        },
+        "href": "https://api.spotify.com/v1/albums/5LEVnXg3usIhjeS7HAadfs",
+        "id": "5LEVnXg3usIhjeS7HAadfs",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2735a5ab94b38aec77383bde6ff",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e025a5ab94b38aec77383bde6ff",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048515a5ab94b38aec77383bde6ff",
+            "width": 64
+          }
+        ],
+        "name": "Postinho de Gasolina",
+        "release_date": "2026-08-07",
+        "release_date_precision": "day",
+        "total_tracks": 1,
+        "type": "album",
+        "uri": "spotify:album:5LEVnXg3usIhjeS7HAadfs"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/6xerOqBLmelL3xZNZkVbGl"
+          },
+          "href": "https://api.spotify.com/v1/artists/6xerOqBLmelL3xZNZkVbGl",
+          "id": "6xerOqBLmelL3xZNZkVbGl",
+          "name": "João Gustavo e Murilo",
+          "type": "artist",
+          "uri": "spotify:artist:6xerOqBLmelL3xZNZkVbGl"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1eIYP01ZLPKEExhcV6xFgt"
+          },
+          "href": "https://api.spotify.com/v1/artists/1eIYP01ZLPKEExhcV6xFgt",
+          "id": "1eIYP01ZLPKEExhcV6xFgt",
+          "name": "Grelo",
+          "type": "artist",
+          "uri": "spotify:artist:1eIYP01ZLPKEExhcV6xFgt"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 143371,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/0xXYRMvxCUBKWVptybXSjB"
+      },
+      "href": "https://api.spotify.com/v1/tracks/0xXYRMvxCUBKWVptybXSjB",
+      "id": "0xXYRMvxCUBKWVptybXSjB",
+      "is_local": false,
+      "name": "Postinho de Gasolina",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:0xXYRMvxCUBKWVptybXSjB"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/0NsJZ5PMjqghGDuMzY7CuT"
+            },
+            "href": "https://api.spotify.com/v1/artists/0NsJZ5PMjqghGDuMzY7CuT",
+            "id": "0NsJZ5PMjqghGDuMzY7CuT",
+            "name": "Marcos & Belutti",
+            "type": "artist",
+            "uri": "spotify:artist:0NsJZ5PMjqghGDuMzY7CuT"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0WvvOZUcB0ZZNV75w1vZXq"
+        },
+        "href": "https://api.spotify.com/v1/albums/0WvvOZUcB0ZZNV75w1vZXq",
+        "id": "0WvvOZUcB0ZZNV75w1vZXq",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273db5c6232449ba83c1391878c",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02db5c6232449ba83c1391878c",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851db5c6232449ba83c1391878c",
+            "width": 64
+          }
+        ],
+        "name": "Acredite",
+        "release_date": "2017-05-26",
+        "release_date_precision": "day",
+        "total_tracks": 14,
+        "type": "album",
+        "uri": "spotify:album:0WvvOZUcB0ZZNV75w1vZXq"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/0NsJZ5PMjqghGDuMzY7CuT"
+          },
+          "href": "https://api.spotify.com/v1/artists/0NsJZ5PMjqghGDuMzY7CuT",
+          "id": "0NsJZ5PMjqghGDuMzY7CuT",
+          "name": "Marcos & Belutti",
+          "type": "artist",
+          "uri": "spotify:artist:0NsJZ5PMjqghGDuMzY7CuT"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 211173,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/5hkjlU7sUcZb9wOYd1eRBE"
+      },
+      "href": "https://api.spotify.com/v1/tracks/5hkjlU7sUcZb9wOYd1eRBE",
+      "id": "5hkjlU7sUcZb9wOYd1eRBE",
+      "is_local": false,
+      "name": "Eu Era",
+      "preview_url": null,
+      "track_number": 3,
+      "type": "track",
+      "uri": "spotify:track:5hkjlU7sUcZb9wOYd1eRBE"
+    },
+    {
+      "album": {
+        "album_type": "single",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1SXhEXzOTF7YeuQX59m7pT"
+            },
+            "href": "https://api.spotify.com/v1/artists/1SXhEXzOTF7YeuQX59m7pT",
+            "id": "1SXhEXzOTF7YeuQX59m7pT",
+            "name": "NATTAN",
+            "type": "artist",
+            "uri": "spotify:artist:1SXhEXzOTF7YeuQX59m7pT"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/7gNT11pbueKrJJWC6Y46OF"
+        },
+        "href": "https://api.spotify.com/v1/albums/7gNT11pbueKrJJWC6Y46OF",
+        "id": "7gNT11pbueKrJJWC6Y46OF",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b27324b12932a55b871ae408e4ca",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e0224b12932a55b871ae408e4ca",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d0000485124b12932a55b871ae408e4ca",
+            "width": 64
+          }
+        ],
+        "name": "Com Você ou Sem",
+        "release_date": "2021-04-01",
+        "release_date_precision": "day",
+        "total_tracks": 5,
+        "type": "album",
+        "uri": "spotify:album:7gNT11pbueKrJJWC6Y46OF"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1SXhEXzOTF7YeuQX59m7pT"
+          },
+          "href": "https://api.spotify.com/v1/artists/1SXhEXzOTF7YeuQX59m7pT",
+          "id": "1SXhEXzOTF7YeuQX59m7pT",
+          "name": "NATTAN",
+          "type": "artist",
+          "uri": "spotify:artist:1SXhEXzOTF7YeuQX59m7pT"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 179234,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/4fgnNikmEUvXze89h3X47m"
+      },
+      "href": "https://api.spotify.com/v1/tracks/4fgnNikmEUvXze89h3X47m",
+      "id": "4fgnNikmEUvXze89h3X47m",
+      "is_local": false,
+      "name": "Morena",
+      "preview_url": null,
+      "track_number": 2,
+      "type": "track",
+      "uri": "spotify:track:4fgnNikmEUvXze89h3X47m"
+    },
+    {
+      "album": {
+        "album_type": "single",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/6fh11OgZMuzObXNUf4AEOr"
+            },
+            "href": "https://api.spotify.com/v1/artists/6fh11OgZMuzObXNUf4AEOr",
+            "id": "6fh11OgZMuzObXNUf4AEOr",
+            "name": "Pedro e Benicio",
+            "type": "artist",
+            "uri": "spotify:artist:6fh11OgZMuzObXNUf4AEOr"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/487N2T9nIPEHrlTZLL3SQs"
+            },
+            "href": "https://api.spotify.com/v1/artists/487N2T9nIPEHrlTZLL3SQs",
+            "id": "487N2T9nIPEHrlTZLL3SQs",
+            "name": "Zé Neto & Cristiano",
+            "type": "artist",
+            "uri": "spotify:artist:487N2T9nIPEHrlTZLL3SQs"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/3sdxIgRUQHtEUouShE84qV"
+        },
+        "href": "https://api.spotify.com/v1/albums/3sdxIgRUQHtEUouShE84qV",
+        "id": "3sdxIgRUQHtEUouShE84qV",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2737ecee51d03109d3fed753c11",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e027ecee51d03109d3fed753c11",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048517ecee51d03109d3fed753c11",
+            "width": 64
+          }
+        ],
+        "name": "A Última Volta",
+        "release_date": "2026-06-04",
+        "release_date_precision": "day",
+        "total_tracks": 1,
+        "type": "album",
+        "uri": "spotify:album:3sdxIgRUQHtEUouShE84qV"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/6fh11OgZMuzObXNUf4AEOr"
+          },
+          "href": "https://api.spotify.com/v1/artists/6fh11OgZMuzObXNUf4AEOr",
+          "id": "6fh11OgZMuzObXNUf4AEOr",
+          "name": "Pedro e Benicio",
+          "type": "artist",
+          "uri": "spotify:artist:6fh11OgZMuzObXNUf4AEOr"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/487N2T9nIPEHrlTZLL3SQs"
+          },
+          "href": "https://api.spotify.com/v1/artists/487N2T9nIPEHrlTZLL3SQs",
+          "id": "487N2T9nIPEHrlTZLL3SQs",
+          "name": "Zé Neto & Cristiano",
+          "type": "artist",
+          "uri": "spotify:artist:487N2T9nIPEHrlTZLL3SQs"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 175777,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/0DVsWau4cc5yKPVj51gg3s"
+      },
+      "href": "https://api.spotify.com/v1/tracks/0DVsWau4cc5yKPVj51gg3s",
+      "id": "0DVsWau4cc5yKPVj51gg3s",
+      "is_local": false,
+      "name": "A Última Volta",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:0DVsWau4cc5yKPVj51gg3s"
+    },
+    {
+      "album": {
+        "album_type": "single",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/3qvcCP2J0fWi0m0uQDUf6r"
+            },
+            "href": "https://api.spotify.com/v1/artists/3qvcCP2J0fWi0m0uQDUf6r",
+            "id": "3qvcCP2J0fWi0m0uQDUf6r",
+            "name": "Luan Santana",
+            "type": "artist",
+            "uri": "spotify:artist:3qvcCP2J0fWi0m0uQDUf6r"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1DuBkL1pAgaZQHXKPiVr08"
+            },
+            "href": "https://api.spotify.com/v1/artists/1DuBkL1pAgaZQHXKPiVr08",
+            "id": "1DuBkL1pAgaZQHXKPiVr08",
+            "name": "Léo Foguete",
+            "type": "artist",
+            "uri": "spotify:artist:1DuBkL1pAgaZQHXKPiVr08"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/0KEpp8HKZa9nFRY060iuUP"
+        },
+        "href": "https://api.spotify.com/v1/albums/0KEpp8HKZa9nFRY060iuUP",
+        "id": "0KEpp8HKZa9nFRY060iuUP",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273d4b8d7a9c31f0862d03fa1bd",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02d4b8d7a9c31f0862d03fa1bd",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851d4b8d7a9c31f0862d03fa1bd",
+            "width": 64
+          }
+        ],
+        "name": "DONA (Ao Vivo)",
+        "release_date": "2025-04-24",
+        "release_date_precision": "day",
+        "total_tracks": 1,
+        "type": "album",
+        "uri": "spotify:album:0KEpp8HKZa9nFRY060iuUP"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/3qvcCP2J0fWi0m0uQDUf6r"
+          },
+          "href": "https://api.spotify.com/v1/artists/3qvcCP2J0fWi0m0uQDUf6r",
+          "id": "3qvcCP2J0fWi0m0uQDUf6r",
+          "name": "Luan Santana",
+          "type": "artist",
+          "uri": "spotify:artist:3qvcCP2J0fWi0m0uQDUf6r"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1DuBkL1pAgaZQHXKPiVr08"
+          },
+          "href": "https://api.spotify.com/v1/artists/1DuBkL1pAgaZQHXKPiVr08",
+          "id": "1DuBkL1pAgaZQHXKPiVr08",
+          "name": "Léo Foguete",
+          "type": "artist",
+          "uri": "spotify:artist:1DuBkL1pAgaZQHXKPiVr08"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 222034,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/6v46jy0bNem1EIbjtfJyee"
+      },
+      "href": "https://api.spotify.com/v1/tracks/6v46jy0bNem1EIbjtfJyee",
+      "id": "6v46jy0bNem1EIbjtfJyee",
+      "is_local": false,
+      "name": "DONA - Ao Vivo",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:6v46jy0bNem1EIbjtfJyee"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1DuBkL1pAgaZQHXKPiVr08"
+            },
+            "href": "https://api.spotify.com/v1/artists/1DuBkL1pAgaZQHXKPiVr08",
+            "id": "1DuBkL1pAgaZQHXKPiVr08",
+            "name": "Léo Foguete",
+            "type": "artist",
+            "uri": "spotify:artist:1DuBkL1pAgaZQHXKPiVr08"
+          },
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1zzQeAzbxN9ctihMrpTo3H"
+            },
+            "href": "https://api.spotify.com/v1/artists/1zzQeAzbxN9ctihMrpTo3H",
+            "id": "1zzQeAzbxN9ctihMrpTo3H",
+            "name": "Acertei",
+            "type": "artist",
+            "uri": "spotify:artist:1zzQeAzbxN9ctihMrpTo3H"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/4RjOODnT7VzuwMJQk7apEG"
+        },
+        "href": "https://api.spotify.com/v1/albums/4RjOODnT7VzuwMJQk7apEG",
+        "id": "4RjOODnT7VzuwMJQk7apEG",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2733d2e759809761471cb1191cc",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e023d2e759809761471cb1191cc",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048513d2e759809761471cb1191cc",
+            "width": 64
+          }
+        ],
+        "name": "Obrigado Deus",
+        "release_date": "2024-10-26",
+        "release_date_precision": "day",
+        "total_tracks": 13,
+        "type": "album",
+        "uri": "spotify:album:4RjOODnT7VzuwMJQk7apEG"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1DuBkL1pAgaZQHXKPiVr08"
+          },
+          "href": "https://api.spotify.com/v1/artists/1DuBkL1pAgaZQHXKPiVr08",
+          "id": "1DuBkL1pAgaZQHXKPiVr08",
+          "name": "Léo Foguete",
+          "type": "artist",
+          "uri": "spotify:artist:1DuBkL1pAgaZQHXKPiVr08"
+        },
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1zzQeAzbxN9ctihMrpTo3H"
+          },
+          "href": "https://api.spotify.com/v1/artists/1zzQeAzbxN9ctihMrpTo3H",
+          "id": "1zzQeAzbxN9ctihMrpTo3H",
+          "name": "Acertei",
+          "type": "artist",
+          "uri": "spotify:artist:1zzQeAzbxN9ctihMrpTo3H"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 154553,
+      "explicit": true,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/3cwVKjzKSTfvacYJF6Tkub"
+      },
+      "href": "https://api.spotify.com/v1/tracks/3cwVKjzKSTfvacYJF6Tkub",
+      "id": "3cwVKjzKSTfvacYJF6Tkub",
+      "is_local": false,
+      "name": "Última Noite - Solo",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:3cwVKjzKSTfvacYJF6Tkub"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/2Z0lRIqr997lIUiPtrpKCr"
+            },
+            "href": "https://api.spotify.com/v1/artists/2Z0lRIqr997lIUiPtrpKCr",
+            "id": "2Z0lRIqr997lIUiPtrpKCr",
+            "name": "Matheus & Kauan",
+            "type": "artist",
+            "uri": "spotify:artist:2Z0lRIqr997lIUiPtrpKCr"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2859TN8HzzAsM8qNgaw60e"
+        },
+        "href": "https://api.spotify.com/v1/albums/2859TN8HzzAsM8qNgaw60e",
+        "id": "2859TN8HzzAsM8qNgaw60e",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2737d96c3456ae2572847148954",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e027d96c3456ae2572847148954",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048517d96c3456ae2572847148954",
+            "width": 64
+          }
+        ],
+        "name": "Na Praia (Ao Vivo)",
+        "release_date": "2016-02-26",
+        "release_date_precision": "day",
+        "total_tracks": 16,
+        "type": "album",
+        "uri": "spotify:album:2859TN8HzzAsM8qNgaw60e"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/2Z0lRIqr997lIUiPtrpKCr"
+          },
+          "href": "https://api.spotify.com/v1/artists/2Z0lRIqr997lIUiPtrpKCr",
+          "id": "2Z0lRIqr997lIUiPtrpKCr",
+          "name": "Matheus & Kauan",
+          "type": "artist",
+          "uri": "spotify:artist:2Z0lRIqr997lIUiPtrpKCr"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 166213,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/0vXKKHxzwndf65d8E10oND"
+      },
+      "href": "https://api.spotify.com/v1/tracks/0vXKKHxzwndf65d8E10oND",
+      "id": "0vXKKHxzwndf65d8E10oND",
+      "is_local": false,
+      "name": "Me Amar Amanhã - Na Praia / Ao Vivo",
+      "preview_url": null,
+      "track_number": 11,
+      "type": "track",
+      "uri": "spotify:track:0vXKKHxzwndf65d8E10oND"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/487N2T9nIPEHrlTZLL3SQs"
+            },
+            "href": "https://api.spotify.com/v1/artists/487N2T9nIPEHrlTZLL3SQs",
+            "id": "487N2T9nIPEHrlTZLL3SQs",
+            "name": "Zé Neto & Cristiano",
+            "type": "artist",
+            "uri": "spotify:artist:487N2T9nIPEHrlTZLL3SQs"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/2uWVAReCZBKft4bKCDSEMy"
+        },
+        "href": "https://api.spotify.com/v1/albums/2uWVAReCZBKft4bKCDSEMy",
+        "id": "2uWVAReCZBKft4bKCDSEMy",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b273eb1117ed6a411587785d7ae4",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e02eb1117ed6a411587785d7ae4",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d00004851eb1117ed6a411587785d7ae4",
+            "width": 64
+          }
+        ],
+        "name": "Um Novo Sonho (Deluxe)",
+        "release_date": "2017-02-03",
+        "release_date_precision": "day",
+        "total_tracks": 24,
+        "type": "album",
+        "uri": "spotify:album:2uWVAReCZBKft4bKCDSEMy"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/487N2T9nIPEHrlTZLL3SQs"
+          },
+          "href": "https://api.spotify.com/v1/artists/487N2T9nIPEHrlTZLL3SQs",
+          "id": "487N2T9nIPEHrlTZLL3SQs",
+          "name": "Zé Neto & Cristiano",
+          "type": "artist",
+          "uri": "spotify:artist:487N2T9nIPEHrlTZLL3SQs"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 210087,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/0xRyAUAA6N6a4vDbZzRwgV"
+      },
+      "href": "https://api.spotify.com/v1/tracks/0xRyAUAA6N6a4vDbZzRwgV",
+      "id": "0xRyAUAA6N6a4vDbZzRwgV",
+      "is_local": false,
+      "name": "Sonha Comigo - Ao Vivo",
+      "preview_url": null,
+      "track_number": 16,
+      "type": "track",
+      "uri": "spotify:track:0xRyAUAA6N6a4vDbZzRwgV"
+    },
+    {
+      "album": {
+        "album_type": "album",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/1elUiq4X7pxej6FRlrEzjM"
+            },
+            "href": "https://api.spotify.com/v1/artists/1elUiq4X7pxej6FRlrEzjM",
+            "id": "1elUiq4X7pxej6FRlrEzjM",
+            "name": "Jorge & Mateus",
+            "type": "artist",
+            "uri": "spotify:artist:1elUiq4X7pxej6FRlrEzjM"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/6nE1C92IIZQBnlYLxObRHW"
+        },
+        "href": "https://api.spotify.com/v1/albums/6nE1C92IIZQBnlYLxObRHW",
+        "id": "6nE1C92IIZQBnlYLxObRHW",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2737541a7dd6385ccb55185c2ce",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e027541a7dd6385ccb55185c2ce",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048517541a7dd6385ccb55185c2ce",
+            "width": 64
+          }
+        ],
+        "name": "Live In London - At The Royal Albert Hall (Ao Vivo)",
+        "release_date": "2013-11-25",
+        "release_date_precision": "day",
+        "total_tracks": 20,
+        "type": "album",
+        "uri": "spotify:album:6nE1C92IIZQBnlYLxObRHW"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/1elUiq4X7pxej6FRlrEzjM"
+          },
+          "href": "https://api.spotify.com/v1/artists/1elUiq4X7pxej6FRlrEzjM",
+          "id": "1elUiq4X7pxej6FRlrEzjM",
+          "name": "Jorge & Mateus",
+          "type": "artist",
+          "uri": "spotify:artist:1elUiq4X7pxej6FRlrEzjM"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 231360,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/3UStHHOyFXetR5621bKJBz"
+      },
+      "href": "https://api.spotify.com/v1/tracks/3UStHHOyFXetR5621bKJBz",
+      "id": "3UStHHOyFXetR5621bKJBz",
+      "is_local": false,
+      "name": "Duas Metades - Ao Vivo",
+      "preview_url": null,
+      "track_number": 17,
+      "type": "track",
+      "uri": "spotify:track:3UStHHOyFXetR5621bKJBz"
+    },
+    {
+      "album": {
+        "album_type": "single",
+        "artists": [
+          {
+            "external_urls": {
+              "spotify": "https://open.spotify.com/artist/3p7PcrEHaaKLJnPUGOtRlT"
+            },
+            "href": "https://api.spotify.com/v1/artists/3p7PcrEHaaKLJnPUGOtRlT",
+            "id": "3p7PcrEHaaKLJnPUGOtRlT",
+            "name": "Henrique & Juliano",
+            "type": "artist",
+            "uri": "spotify:artist:3p7PcrEHaaKLJnPUGOtRlT"
+          }
+        ],
+        "external_urls": {
+          "spotify": "https://open.spotify.com/album/7ufAQ7EXPaaozbcIWszU5F"
+        },
+        "href": "https://api.spotify.com/v1/albums/7ufAQ7EXPaaozbcIWszU5F",
+        "id": "7ufAQ7EXPaaozbcIWszU5F",
+        "images": [
+          {
+            "height": 640,
+            "url": "https://i.scdn.co/image/ab67616d0000b2734453a73d31d7a3fd8a23e0c9",
+            "width": 640
+          },
+          {
+            "height": 300,
+            "url": "https://i.scdn.co/image/ab67616d00001e024453a73d31d7a3fd8a23e0c9",
+            "width": 300
+          },
+          {
+            "height": 64,
+            "url": "https://i.scdn.co/image/ab67616d000048514453a73d31d7a3fd8a23e0c9",
+            "width": 64
+          }
+        ],
+        "name": "Até Você Voltar (Ao Vivo)",
+        "release_date": "2014-06-09",
+        "release_date_precision": "day",
+        "total_tracks": 1,
+        "type": "album",
+        "uri": "spotify:album:7ufAQ7EXPaaozbcIWszU5F"
+      },
+      "artists": [
+        {
+          "external_urls": {
+            "spotify": "https://open.spotify.com/artist/3p7PcrEHaaKLJnPUGOtRlT"
+          },
+          "href": "https://api.spotify.com/v1/artists/3p7PcrEHaaKLJnPUGOtRlT",
+          "id": "3p7PcrEHaaKLJnPUGOtRlT",
+          "name": "Henrique & Juliano",
+          "type": "artist",
+          "uri": "spotify:artist:3p7PcrEHaaKLJnPUGOtRlT"
+        }
+      ],
+      "disc_number": 1,
+      "duration_ms": 204080,
+      "explicit": false,
+      "external_urls": {
+        "spotify": "https://open.spotify.com/track/4ksSf8cL3VlUvQSkFcRHy3"
+      },
+      "href": "https://api.spotify.com/v1/tracks/4ksSf8cL3VlUvQSkFcRHy3",
+      "id": "4ksSf8cL3VlUvQSkFcRHy3",
+      "is_local": false,
+      "name": "Até Você Voltar - Ao Vivo",
+      "preview_url": null,
+      "track_number": 1,
+      "type": "track",
+      "uri": "spotify:track:4ksSf8cL3VlUvQSkFcRHy3"
+    }
+  ]
+}

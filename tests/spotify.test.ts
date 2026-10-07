@@ -194,6 +194,66 @@ describe("Spotify request adapter", () => {
     await Promise.all([firstRequest, secondRequest]);
   });
 
+  it("does not let one caller abort a shared token refresh", async () => {
+    const spotify = await loadSpotify();
+    let resolveToken!: (response: Response) => void;
+    const tokenPromise = new Promise<Response>((resolve) => {
+      resolveToken = resolve;
+    });
+    const fetchMock = vi.fn<typeof fetch>((input, init) => {
+      if (String(input) === TOKEN_URL) {
+        const signal = init?.signal;
+
+        return new Promise<Response>((resolve, reject) => {
+          if (signal?.aborted) {
+            reject(signal.reason);
+            return;
+          }
+
+          signal?.addEventListener(
+            "abort",
+            () => reject(signal.reason),
+            { once: true },
+          );
+          void tokenPromise.then(resolve, reject);
+        });
+      }
+
+      if (init?.signal?.aborted) {
+        return Promise.reject(init.signal.reason);
+      }
+
+      return Promise.resolve(jsonResponse({ ok: true }));
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const controller = new AbortController();
+    const firstRequest = spotify.requestRaw("/me", {
+      signal: controller.signal,
+    });
+    const secondRequest = spotify.requestRaw("/me/player/queue");
+    const firstExpectation = expect(firstRequest).rejects.toMatchObject({
+      message: "Spotify API request was aborted.",
+    });
+    const secondExpectation = expect(secondRequest).resolves.toMatchObject({
+      status: 200,
+      bodyText: '{"ok":true}',
+    });
+    const tokenCalls = fetchMock.mock.calls.filter(
+      ([input]) => String(input) === TOKEN_URL,
+    );
+
+    expect(tokenCalls).toHaveLength(1);
+    controller.abort();
+    resolveToken(tokenResponse());
+
+    await Promise.all([firstExpectation, secondExpectation]);
+    expect(
+      fetchMock.mock.calls.filter(([input]) => String(input) === TOKEN_URL),
+    ).toHaveLength(1);
+  });
+
   it("waits for a short Retry-After value and retries once", async () => {
     vi.useFakeTimers();
 
