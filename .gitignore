@@ -8,6 +8,7 @@
 /coverage
 /.vercel
 /.turbo
+/spike-output/
 .env*
 !.env.example
 *.tsbuildinfo

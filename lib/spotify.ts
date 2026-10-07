@@ -31,6 +31,12 @@ export interface SpotifyRequestInit extends Omit<RequestInit, "body"> {
       >;
 }
 
+export interface SpotifyRawResponse {
+  status: number;
+  headers: Headers;
+  bodyText: string;
+}
+
 let cachedAccessToken: CachedAccessToken | undefined;
 let tokenRefreshInFlight: Promise<string> | undefined;
 
@@ -411,6 +417,25 @@ async function fetchSpotify(
   );
 
   return { accessToken, response, text };
+}
+
+export async function requestRaw(
+  path: string,
+  init: SpotifyRequestInit = {},
+): Promise<SpotifyRawResponse> {
+  const credentials = getCredentials();
+  const { fetchInit, url } = createSpotifyRequest(path, init);
+  const { accessToken, response, text } = await fetchSpotify(
+    url,
+    fetchInit,
+    credentials,
+  );
+
+  return {
+    status: response.status,
+    headers: response.headers,
+    bodyText: redactSecrets(text, credentials, accessToken),
+  };
 }
 
 function readErrorDetails(
