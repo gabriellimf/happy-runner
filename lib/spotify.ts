@@ -1,5 +1,14 @@
 import { Buffer } from "node:buffer";
 
+import { createSearchCache } from "./search-cache";
+import {
+  parseSpotifyQueue,
+  parseSpotifySearchResults,
+} from "./spotify-responses";
+import type { QueueResponse, Track } from "./spotify-responses";
+
+export type { QueueResponse, QueueTrack, Track } from "./spotify-responses";
+
 const SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1/";
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 const TOKEN_EXPIRY_MARGIN_MS = 60_000;
@@ -39,6 +48,7 @@ export interface SpotifyRawResponse {
 
 let cachedAccessToken: CachedAccessToken | undefined;
 let tokenRefreshInFlight: Promise<string> | undefined;
+const searchCache = createSearchCache<Track[]>(() => Date.now());
 
 export class SpotifyError extends Error {
   constructor(message: string, cause?: unknown) {
@@ -460,6 +470,23 @@ function readErrorDetails(
   }
 }
 
+function readRateLimitErrorDetails(
+  text: string,
+  response: Response,
+  credentials: SpotifyCredentials,
+  accessToken: string,
+): SpotifyErrorDetails {
+  try {
+    return readErrorDetails(text, response, credentials, accessToken);
+  } catch (error) {
+    if (error instanceof SpotifyApiError) {
+      return {};
+    }
+
+    throw error;
+  }
+}
+
 function parseRetryAfterSeconds(response: Response): number | undefined {
   const value = response.headers.get("Retry-After")?.trim();
 
@@ -501,6 +528,7 @@ function parseSuccessBody<T>(
 export async function request<T = unknown>(
   path: string,
   init: SpotifyRequestInit = {},
+  options: { ignoreResponseBody?: boolean } = {},
 ): Promise<T | undefined> {
   const credentials = getCredentials();
   const { fetchInit, url } = createSpotifyRequest(path, init);
@@ -512,7 +540,12 @@ export async function request<T = unknown>(
 
   if (response.status === 429) {
     const retryAfterSeconds = parseRetryAfterSeconds(response);
-    const details = readErrorDetails(text, response, credentials, accessToken);
+    const details = readRateLimitErrorDetails(
+      text,
+      response,
+      credentials,
+      accessToken,
+    );
 
     if (
       retryAfterSeconds === undefined ||
@@ -534,7 +567,7 @@ export async function request<T = unknown>(
 
     if (response.status === 429) {
       const retryAfter = parseRetryAfterSeconds(response);
-      const retryDetails = readErrorDetails(
+      const retryDetails = readRateLimitErrorDetails(
         text,
         response,
         credentials,
@@ -560,5 +593,52 @@ export async function request<T = unknown>(
     );
   }
 
-  return parseSuccessBody<T>(response, text);
+  return options.ignoreResponseBody
+    ? undefined
+    : parseSuccessBody<T>(response, text);
+}
+
+export async function search(query: string): Promise<Track[]> {
+  const trimmedQuery = query.trim();
+  const normalizedQuery = trimmedQuery.toLowerCase();
+  const cachedResults = searchCache.get(normalizedQuery);
+
+  if (cachedResults !== undefined) {
+    return cachedResults;
+  }
+
+  const response = await request<unknown>("search", {
+    query: {
+      limit: 5,
+      market: "BR",
+      q: trimmedQuery,
+      type: "track",
+    },
+  });
+  const results = parseSpotifySearchResults(response);
+
+  searchCache.set(normalizedQuery, results);
+
+  return results;
+}
+
+export async function addToQueue(uri: string): Promise<void> {
+  await request(
+    "me/player/queue",
+    {
+      method: "POST",
+      query: { uri },
+    },
+    { ignoreResponseBody: true },
+  );
+}
+
+export async function getQueue(): Promise<QueueResponse> {
+  const response = await request<unknown>("me/player/queue");
+
+  return parseSpotifyQueue(response);
+}
+
+export function resetSearchCache(): void {
+  searchCache.clear();
 }
