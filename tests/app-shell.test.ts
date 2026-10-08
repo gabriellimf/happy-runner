@@ -19,6 +19,7 @@ describe("app shell", () => {
     expect(viewport).toMatchObject({
       initialScale: 1,
       width: "device-width",
+      viewportFit: "cover",
     });
   });
 });
