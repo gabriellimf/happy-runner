@@ -27,6 +27,13 @@ The owner authenticates once. Guests do not log in, and the site does not play a
 
 The owner needs Spotify Premium for an app in development mode. Development mode supports up to 5 authenticated users, and each user must be on the app's allowlist.
 
+## API
+
+- `GET /api/search?q=<query>` accepts 4 to 100 characters and returns `{ items: Track[] }`, where `Track` is `{ id, uri, title, artists: string[], coverUrl: string | null, durationMs }`.
+- `POST /api/queue` accepts `{ uri: "spotify:track:..." }` and returns `{ ok: true }`.
+- `GET /api/queue` returns `{ nowPlaying: QueueTrack | null, next: QueueTrack[] }`, where `QueueTrack` is `{ id, title, artists: string[], coverUrl: string | null }`. It sets `Cache-Control: no-store`.
+- Errors use `{ error: { code, message } }`: `INVALID_INPUT` (400), `NO_ACTIVE_DEVICE` (503), `RATE_LIMITED` (429), `UPSTREAM_ERROR` (502), or `INTERNAL_ERROR` (500).
+
 ## Development
 
 Run the project gate:
