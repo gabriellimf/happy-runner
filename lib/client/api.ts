@@ -1,4 +1,9 @@
-import type { QueueResponse, QueueTrack, Track } from "../spotify-responses";
+import type {
+  InQueue,
+  QueueResponse,
+  QueueTrack,
+  Track,
+} from "../spotify-responses";
 
 export class ClientApiError extends Error {
   readonly code: string | null;
@@ -25,8 +30,33 @@ export class ClientNetworkError extends Error {
   }
 }
 
+export interface SearchResponse {
+  // string: add this track on Enter. null: no confident match.
+  // undefined: not judged, so the first item is the default.
+  autoAddId?: string | null;
+  // Track ids already in the queue, by kind. Absent when none match.
+  inQueue?: InQueue;
+  items: Track[];
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseInQueue(value: unknown): InQueue | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const inQueue: InQueue = {};
+
+  for (const [id, kind] of Object.entries(value)) {
+    if (kind === "exact" || kind === "version") {
+      inQueue[id] = kind;
+    }
+  }
+
+  return Object.keys(inQueue).length > 0 ? inQueue : undefined;
 }
 
 function isTrack(value: unknown): value is Track {
@@ -107,7 +137,7 @@ async function readApiError(response: Response): Promise<ClientApiError> {
 export async function searchTracks(
   query: string,
   signal?: AbortSignal,
-): Promise<Track[]> {
+): Promise<SearchResponse> {
   const response = await request(
     `/api/search?q=${encodeURIComponent(query)}`,
     { method: "GET", signal, cache: "no-store" },
@@ -123,9 +153,20 @@ export async function searchTracks(
     throw new Error("Search response has an invalid shape");
   }
 
-  const tracks = body.items.filter(isTrack);
+  const items = body.items.filter(isTrack).slice(0, 5);
+  const { autoAddId } = body;
+  const inQueue = parseInQueue(body.inQueue);
+  const result: SearchResponse = { items };
 
-  return tracks.slice(0, 5);
+  if (typeof autoAddId === "string" || autoAddId === null) {
+    result.autoAddId = autoAddId;
+  }
+
+  if (inQueue) {
+    result.inQueue = inQueue;
+  }
+
+  return result;
 }
 
 export async function addTrack(uri: string): Promise<void> {

@@ -1,9 +1,23 @@
 import { apiErrorResponse, invalidInputResponse } from "../../../lib/api-errors";
+import { isPlaybackCommand } from "../../../lib/intent-gate";
+import {
+  markQueued,
+  queuedTrackIds,
+  readQueueOrUndefined,
+} from "../../../lib/queue-duplicates";
+import { judgeSearch } from "../../../lib/search-judgment";
 import { search } from "../../../lib/spotify";
+import type { InQueue, Track } from "../../../lib/spotify-responses";
 
 const MIN_QUERY_LENGTH = 4;
 const MAX_QUERY_LENGTH = 100;
 const MAX_RAW_QUERY_LENGTH = 400;
+
+interface SearchResponse {
+  autoAddId?: string | null;
+  inQueue?: InQueue;
+  items: Track[];
+}
 
 export async function GET(request: Request): Promise<Response> {
   const rawQuery = new URL(request.url).searchParams.get("q") ?? "";
@@ -36,7 +50,39 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    return Response.json({ items: await search(query) });
+    if (isPlaybackCommand(query)) {
+      return Response.json({ items: [] });
+    }
+
+    // The queue read only feeds the duplicate hint, so it runs alongside the search.
+    const [items, queue] = await Promise.all([
+      search(query),
+      readQueueOrUndefined(),
+    ]);
+    const { autoAddId, blocked, similarIds } = await judgeSearch(
+      query,
+      items,
+      queue,
+    );
+
+    if (blocked) {
+      return Response.json({ items: [] });
+    }
+
+    const inQueue = queue
+      ? markQueued(items, queuedTrackIds(queue), similarIds)
+      : {};
+    const body: SearchResponse = { items };
+
+    if (autoAddId !== undefined) {
+      body.autoAddId = autoAddId;
+    }
+
+    if (Object.keys(inQueue).length > 0) {
+      body.inQueue = inQueue;
+    }
+
+    return Response.json(body);
   } catch (error) {
     return apiErrorResponse(error);
   }

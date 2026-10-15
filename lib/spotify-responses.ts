@@ -19,6 +19,12 @@ export interface QueueResponse {
   next: QueueTrack[];
 }
 
+// exact: the same Spotify track id is playing or queued.
+// version: Jev judged it another version of a queued song.
+export type InQueueKind = "exact" | "version";
+
+export type InQueue = Record<string, InQueueKind>;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

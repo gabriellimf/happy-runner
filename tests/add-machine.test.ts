@@ -6,6 +6,7 @@ import {
   createAddMachine,
 } from "../lib/client/add-machine";
 import { createSearchMachine } from "../lib/client/search-machine";
+import { CLIENT_MESSAGES } from "../lib/client/errors";
 import type { Track } from "../lib/spotify-responses";
 
 type MockFetch = (
@@ -79,7 +80,211 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("add machine duplicate handling", () => {
+  function respondWith(body: Record<string, unknown>): MockFetch {
+    return (input, init) =>
+      String(input).startsWith("/api/search")
+        ? Promise.resolve(jsonResponse(body))
+        : searchAndAddResponse(input, init);
+  }
+
+  function posts(harness: ReturnType<typeof createHarness>) {
+    return harness.fetchMock.mock.calls.filter(
+      ([, init]) => init?.method === "POST",
+    );
+  }
+
+  it("shows a hint and adds nothing on Enter when the first result is another version of a queued song", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness(
+      respondWith({
+        inQueue: { first: "version" },
+        items: [track("first")],
+      }),
+    );
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(0);
+    expect(harness.add.getSnapshot()).toMatchObject({
+      isAdding: false,
+      notice: { kind: "hint", text: CLIENT_MESSAGES.versionInQueue },
+    });
+    expect(harness.search.getText()).toBe("abba");
+    expect(harness.refreshQueue).not.toHaveBeenCalled();
+  });
+
+  it("applies the same rule to the fresh search that Enter runs", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness(
+      respondWith({
+        inQueue: { first: "version" },
+        items: [track("first")],
+      }),
+    );
+    harness.search.setText("abba");
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(0);
+    expect(harness.add.getSnapshot().notice).toMatchObject({
+      kind: "hint",
+      text: CLIENT_MESSAGES.versionInQueue,
+    });
+  });
+
+  it("checks the version flag of the autoAddId track, not of the first result", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness(
+      respondWith({
+        autoAddId: "second",
+        inQueue: { first: "version" },
+        items: [track("first"), track("second")],
+      }),
+    );
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(posts(harness)[0][1]?.body).toBe(
+      JSON.stringify({ uri: track("second").uri }),
+    );
+  });
+
+  it("still adds a version when the guest taps it", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness(
+      respondWith({
+        inQueue: { first: "version" },
+        items: [track("first")],
+      }),
+    );
+    await loadSearch(harness.search);
+
+    await harness.add.add(track("first"));
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(harness.add.getSnapshot().notice?.text).toBe(
+      "Adicionada à fila: Faixa first",
+    );
+  });
+
+  it("sends an exact match to the server and shows its already-in-queue message", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        return Promise.resolve(
+          jsonResponse(
+            {
+              error: {
+                code: "ALREADY_IN_QUEUE",
+                message: "Essa música já está na fila",
+              },
+            },
+            409,
+          ),
+        );
+      }
+
+      return respondWith({
+        inQueue: { first: "exact" },
+        items: [track("first")],
+      })(input, init);
+    });
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(harness.add.getSnapshot().notice).toMatchObject({
+      kind: "error",
+      text: CLIENT_MESSAGES.alreadyInQueue,
+    });
+    expect(harness.search.getText()).toBe("abba");
+    expect(harness.refreshQueue).not.toHaveBeenCalled();
+  });
+});
+
 describe("add machine Enter fast path", () => {
+  it("adds the track chosen by autoAddId instead of the first result", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) =>
+      String(input).startsWith("/api/search")
+        ? Promise.resolve(
+            jsonResponse({
+              autoAddId: "second",
+              items: [track("first"), track("second")],
+            }),
+          )
+        : searchAndAddResponse(input, init),
+    );
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    const post = harness.fetchMock.mock.calls[1];
+
+    expect(post[0]).toBe("/api/queue");
+    expect(post[1]?.body).toBe(
+      JSON.stringify({ uri: track("second").uri }),
+    );
+    expect(harness.add.getSnapshot().notice?.text).toBe(
+      "Adicionada à fila: Faixa second",
+    );
+  });
+
+  it.each([
+    ["autoAddId is null", null],
+    ["autoAddId is not in the results", "missing"],
+  ])("shows a hint and adds nothing when %s", async (_label, autoAddId) => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) =>
+      String(input).startsWith("/api/search")
+        ? Promise.resolve(
+            jsonResponse({
+              autoAddId,
+              items: [track("first"), track("second")],
+            }),
+          )
+        : searchAndAddResponse(input, init),
+    );
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(harness.fetchMock).toHaveBeenCalledTimes(1);
+    expect(harness.add.getSnapshot()).toMatchObject({
+      isAdding: false,
+      notice: { kind: "hint", text: CLIENT_MESSAGES.pickSuggestion },
+    });
+    expect(harness.search.getText()).toBe("abba");
+    expect(harness.refreshQueue).not.toHaveBeenCalled();
+  });
+
+  it("shows a hint and adds nothing when the fresh search is not confident", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) =>
+      String(input).startsWith("/api/search")
+        ? Promise.resolve(
+            jsonResponse({ autoAddId: null, items: [track("first")] }),
+          )
+        : searchAndAddResponse(input, init),
+    );
+    harness.search.setText("abba");
+
+    await harness.add.submit("abba");
+
+    expect(
+      harness.fetchMock.mock.calls.filter(([, init]) => init?.method === "POST"),
+    ).toHaveLength(0);
+    expect(harness.add.getSnapshot()).toMatchObject({
+      isAdding: false,
+      notice: { kind: "hint", text: CLIENT_MESSAGES.pickSuggestion },
+    });
+  });
+
   it("adds the first current result without running another search", async () => {
     vi.useFakeTimers();
     const harness = createHarness(searchAndAddResponse);

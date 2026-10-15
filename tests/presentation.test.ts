@@ -127,6 +127,43 @@ describe("presentational components", () => {
     expect(markup).not.toContain("motion-safe:animate-pulse");
   });
 
+  it("badges suggestions that are already in the queue", () => {
+    const markup = renderToStaticMarkup(
+      createElement(SuggestionList, {
+        activeTrackId: null,
+        inQueue: {
+          "search-track-1": "exact",
+          "search-track-2": "version",
+        },
+        isAdding: false,
+        items: [searchTrack(1), searchTrack(2), searchTrack(3)],
+        onSelect: () => {},
+        phase: "results",
+        query: "abba",
+        resultQuery: "abba",
+      }),
+    );
+
+    expect(markup.match(/Já na fila/g)).toHaveLength(1);
+    expect(markup.match(/Versão na fila/g)).toHaveLength(1);
+  });
+
+  it("shows no badge when inQueue is absent", () => {
+    const markup = renderToStaticMarkup(
+      createElement(SuggestionList, {
+        activeTrackId: null,
+        isAdding: false,
+        items: [searchTrack(1)],
+        onSelect: () => {},
+        phase: "results",
+        query: "abba",
+        resultQuery: "abba",
+      }),
+    );
+
+    expect(markup).not.toContain("na fila");
+  });
+
   it("uses the shorter search placeholder", () => {
     const markup = renderToStaticMarkup(
       createElement(SearchForm, {

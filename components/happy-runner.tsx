@@ -99,6 +99,7 @@ export function HappyRunner() {
         />
         <SuggestionList
           activeTrackId={add.state.activeTrackId}
+          inQueue={search.state.inQueue}
           isAdding={add.state.isAdding}
           items={search.state.items}
           onSelect={(track) => {
