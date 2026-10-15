@@ -49,6 +49,24 @@ const INITIAL_STATE: AddState = {
   notice: null,
 };
 
+function selectAutoAddTrack(
+  items: readonly Track[],
+  autoAddId: string | null | undefined,
+): Track | undefined {
+  return autoAddId === undefined
+    ? items[0]
+    : items.find((track) => track.id === autoAddId);
+}
+
+// Enter must not add a track that Jev judged to be another version of a queued song.
+// Tapping the suggestion still adds it.
+function isQueuedVersion(
+  track: Track,
+  inQueue: SearchState["inQueue"],
+): boolean {
+  return inQueue?.[track.id] === "version";
+}
+
 export function createAddMachine(options: AddMachineOptions): AddMachine {
   const addRequest = options.addRequest ?? addTrack;
   const listeners = new Set<() => void>();
@@ -122,6 +140,15 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
         kind: "error",
         text: getClientErrorMessage(error, options.isOnline?.()),
       },
+    });
+  }
+
+  function showSuggestionHint(text: string = CLIENT_MESSAGES.pickSuggestion): void {
+    clearSuccessTimer();
+    publish({
+      ...state,
+      isNoticeFading: false,
+      notice: { kind: "hint", text },
     });
   }
 
@@ -199,10 +226,17 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
     }
 
     if (currentSearch && searchState.phase === "results") {
-      const firstTrack = searchState.items[0];
+      const track = selectAutoAddTrack(
+        searchState.items,
+        searchState.autoAddId,
+      );
 
-      if (firstTrack) {
-        await add(firstTrack, submittedText);
+      if (!track) {
+        showSuggestionHint();
+      } else if (isQueuedVersion(track, searchState.inQueue)) {
+        showSuggestionHint(CLIENT_MESSAGES.versionInQueue);
+      } else {
+        await add(track, submittedText);
       }
 
       return;
@@ -219,7 +253,19 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
         return;
       }
 
-      await addToQueue(result.items[0], submittedText);
+      const track = selectAutoAddTrack(result.items, result.autoAddId);
+
+      if (!track) {
+        showSuggestionHint();
+        return;
+      }
+
+      if (isQueuedVersion(track, result.inQueue)) {
+        showSuggestionHint(CLIENT_MESSAGES.versionInQueue);
+        return;
+      }
+
+      await addToQueue(track, submittedText);
     } catch (error) {
       showError(error);
     } finally {

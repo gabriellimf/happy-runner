@@ -75,8 +75,8 @@ Guest phone --> Next.js on Vercel (API routes) --> Spotify Web API
 
 | Route | Method | Spotify call | Notes |
 |---|---|---|---|
-| `/api/search?q=` | GET | `GET /v1/search?type=track&market=BR&limit=5` | Reject `q` shorter than 4 characters. Cache by normalized query in memory (short TTL). |
-| `/api/queue` | POST | `POST /v1/me/player/queue?uri=` | Body: `{ uri }`. Maps Spotify errors to messages (see Errors). |
+| `/api/search?q=` | GET | `GET /v1/search?type=track&market=BR&limit=5` and `GET /v1/me/player/queue` | Reject `q` shorter than 4 characters. Cache the search by normalized query in memory (short TTL). The queue read is not cached. It marks results that are already in the queue (`inQueue`). |
+| `/api/queue` | POST | `GET /v1/me/player/queue`, then `POST /v1/me/player/queue?uri=` | Body: `{ uri }`. Returns 409 `ALREADY_IN_QUEUE` when the track id is playing or queued. If the queue read fails, the add goes on. Maps Spotify errors to messages (see Errors). |
 | `/api/queue` | GET | `GET /v1/me/player/queue` | Returns "now playing" plus next items. |
 
 Never expose the access token or refresh token to the client.
@@ -87,6 +87,7 @@ Never expose the access token or refresh token to the client.
 - Typing: debounce about 300 ms. Search starts at 4 characters or more. Show up to 5 suggestions with cover, title, and artist.
 - Enter (or the add button) adds the first result. This is the main fast path.
 - Tapping a suggestion adds that track.
+- A suggestion that is already in the queue shows the badge "Já na fila". One that is another version of a queued song shows "Versão na fila". On Enter, a "Versão na fila" track is not added and a hint explains why. Tapping it adds it.
 - After a successful add: clear the input, show a short confirmation, refresh the queue.
 - Below the input: "Tocando agora" and the next items. Poll `GET /api/queue` every about 5 s. Pause polling when the tab is hidden.
 - Cancel the previous in-flight search when the user types again.
@@ -98,6 +99,7 @@ Never expose the access token or refresh token to the client.
 | No active device | 404 `NO_ACTIVE_DEVICE` | "Player offline, tente em instantes" |
 | Rate limit or quota | 429 (honor `Retry-After`) | "Muita gente pedindo, tente de novo" |
 | No search result | empty list | "Nenhuma música encontrada" |
+| Track already playing or queued | server check, 409 `ALREADY_IN_QUEUE` | "Essa música já está na fila" |
 | Other | 5xx or unknown | "Algo deu errado, tente de novo" |
 
 Note: Spike #3 did not reproduce the 404 `NO_ACTIVE_DEVICE` signal. `add` returned 200 with Spotify closed on every device. See #13.
@@ -106,7 +108,7 @@ Enter must keep working when suggestions fail.
 
 ## Out of scope (MVP)
 
-- Per-person limits, duplicate blocking, explicit-content filter.
+- Per-person limits, explicit-content filter.
 - Admin page, skip button, database, custom domain.
 - YouTube or any other provider.
 

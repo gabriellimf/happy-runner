@@ -1,12 +1,16 @@
 import { ClientApiError, ClientNetworkError } from "./api";
 
 export const CLIENT_MESSAGES = {
+  alreadyInQueue: "Essa música já está na fila",
   emptySearch: "Nenhuma música encontrada",
   genericError: "Algo deu errado, tente de novo",
   noActiveDevice: "Player offline, tente em instantes",
   offline: "Sem conexão. Verifique sua internet e tente de novo",
+  pickSuggestion: "Não tenho certeza. Toque em uma sugestão",
   rateLimited: "Muita gente pedindo, tente de novo",
   shortQuery: "Digite pelo menos 4 letras",
+  versionInQueue:
+    "Já tem uma versão dessa música na fila. Toque nela para adicionar mesmo assim",
 } as const;
 
 function browserIsOnline(): boolean {
@@ -34,6 +38,8 @@ export function getClientErrorMessage(
 
   if (error instanceof ClientApiError) {
     switch (error.code) {
+      case "ALREADY_IN_QUEUE":
+        return CLIENT_MESSAGES.alreadyInQueue;
       case "NO_ACTIVE_DEVICE":
         return CLIENT_MESSAGES.noActiveDevice;
       case "RATE_LIMITED":

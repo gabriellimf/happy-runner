@@ -1,5 +1,5 @@
 import type { Track } from "../spotify-responses";
-import { searchTracks } from "./api";
+import { type SearchResponse, searchTracks } from "./api";
 import { getClientErrorMessage } from "./errors";
 
 export const MIN_SEARCH_QUERY_LENGTH = 4;
@@ -14,7 +14,9 @@ export type SearchPhase =
   | "error";
 
 export interface SearchState {
+  autoAddId?: SearchResponse["autoAddId"];
   errorMessage: string | null;
+  inQueue?: SearchResponse["inQueue"];
   items: Track[];
   phase: SearchPhase;
   query: string;
@@ -23,14 +25,19 @@ export interface SearchState {
 }
 
 export type SearchNowResult =
-  | { kind: "success"; items: Track[] }
+  | {
+      kind: "success";
+      autoAddId: SearchResponse["autoAddId"];
+      inQueue: SearchResponse["inQueue"];
+      items: Track[];
+    }
   | { kind: "error"; message: string }
   | { kind: "invalid" }
   | { kind: "stale" };
 
 interface SearchMachineOptions {
   isOnline?: () => boolean;
-  search?: (query: string, signal: AbortSignal) => Promise<Track[]>;
+  search?: (query: string, signal: AbortSignal) => Promise<SearchResponse>;
 }
 
 interface SearchMachine {
@@ -44,7 +51,9 @@ interface SearchMachine {
 }
 
 const INITIAL_STATE: SearchState = {
+  autoAddId: undefined,
   errorMessage: null,
+  inQueue: undefined,
   items: [],
   phase: "idle",
   query: "",
@@ -129,7 +138,10 @@ export function createSearchMachine(
     });
 
     try {
-      const items = await search(query, requestController.signal);
+      const { autoAddId, inQueue, items } = await search(
+        query,
+        requestController.signal,
+      );
 
       if (!isCurrentRequest(requestGeneration, requestController)) {
         return { kind: "stale" };
@@ -137,14 +149,16 @@ export function createSearchMachine(
 
       publish({
         ...state,
+        autoAddId,
         errorMessage: null,
+        inQueue,
         items,
         phase: items.length > 0 ? "results" : "empty",
         query,
         resultQuery: query,
       });
 
-      return { kind: "success", items };
+      return { kind: "success", autoAddId, inQueue, items };
     } catch (error) {
       if (!isCurrentRequest(requestGeneration, requestController)) {
         return { kind: "stale" };
@@ -157,7 +171,9 @@ export function createSearchMachine(
 
       publish({
         ...state,
+        autoAddId: undefined,
         errorMessage: message,
+        inQueue: undefined,
         items: [],
         phase: "error",
         query,
@@ -186,7 +202,9 @@ export function createSearchMachine(
 
     publish({
       ...state,
+      autoAddId: validQuery ? state.autoAddId : undefined,
       errorMessage: null,
+      inQueue: validQuery ? state.inQueue : undefined,
       items: validQuery ? state.items : [],
       phase: validQuery ? "debouncing" : "idle",
       query,

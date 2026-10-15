@@ -1,9 +1,15 @@
-import type { Track } from "../lib/spotify-responses";
+import type { InQueue, InQueueKind, Track } from "../lib/spotify-responses";
 import type { SearchPhase } from "../lib/client/search-machine";
 import { TrackRow } from "./track-row";
 
+const QUEUE_BADGES: Record<InQueueKind, string> = {
+  exact: "Já na fila",
+  version: "Versão na fila",
+};
+
 interface SuggestionListProps {
   activeTrackId: string | null;
+  inQueue?: InQueue;
   isAdding: boolean;
   items: Track[];
   onSelect: (track: Track) => void;
@@ -29,6 +35,7 @@ function SuggestionSkeleton() {
 
 export function SuggestionList({
   activeTrackId,
+  inQueue,
   isAdding,
   items,
   onSelect,
@@ -59,6 +66,11 @@ export function SuggestionList({
             >
               <span className="sr-only">Adicionar </span>
               <TrackRow track={track} />
+              {inQueue?.[track.id] ? (
+                <span className="mt-1 ml-15 block text-xs text-amber-300">
+                  {QUEUE_BADGES[inQueue[track.id]]}
+                </span>
+              ) : null}
             </button>
           </li>
         ))}

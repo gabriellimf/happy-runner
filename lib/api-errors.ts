@@ -50,6 +50,18 @@ export function invalidInputResponse(message: string): Response {
   );
 }
 
+export function alreadyInQueueResponse(): Response {
+  return Response.json(
+    {
+      error: {
+        code: "ALREADY_IN_QUEUE",
+        message: "Essa música já está na fila",
+      },
+    },
+    { status: 409 },
+  );
+}
+
 export function apiErrorResponse(
   error: unknown,
   { headers: responseHeaders, playerEndpoint = false }: ApiErrorOptions = {},

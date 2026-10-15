@@ -33,6 +33,58 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("search machine inQueue", () => {
+  it("keeps inQueue from the response and clears it when the text becomes invalid", async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        jsonResponse({
+          inQueue: { result: "version" },
+          items: [track("result")],
+        }),
+      ),
+    );
+    const machine = createSearchMachine();
+
+    machine.setText("abba");
+    await vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS);
+    await flushPromises();
+
+    expect(machine.getSnapshot().inQueue).toEqual({ result: "version" });
+
+    machine.setText("abb");
+
+    expect(machine.getSnapshot().inQueue).toBeUndefined();
+  });
+
+  it("returns inQueue from searchNow and clears it on a failed search", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            inQueue: { result: "exact" },
+            items: [track("result")],
+          }),
+        )
+        .mockResolvedValueOnce(new Response("{}", { status: 502 })),
+    );
+    const machine = createSearchMachine({ isOnline: () => true });
+
+    await expect(machine.searchNow("abba")).resolves.toMatchObject({
+      inQueue: { result: "exact" },
+      kind: "success",
+    });
+    expect(machine.getSnapshot().inQueue).toEqual({ result: "exact" });
+
+    await machine.searchNow("queen");
+
+    expect(machine.getSnapshot().inQueue).toBeUndefined();
+  });
+});
+
 describe("search machine", () => {
   it("does not search until the trimmed query has four characters", async () => {
     vi.useFakeTimers();

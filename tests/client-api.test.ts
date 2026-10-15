@@ -67,6 +67,54 @@ describe("client API", () => {
   });
 
   it.each([
+    ["a track id", "track-id", { autoAddId: "track-id" }],
+    ["null", null, { autoAddId: null }],
+    ["a number", 7, {}],
+    ["a missing value", undefined, {}],
+  ])("parses autoAddId when it is %s", async (_label, autoAddId, expected) => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(jsonResponse({ autoAddId, items: [track()] })),
+    );
+
+    await expect(searchTracks("abba")).resolves.toEqual({
+      ...expected,
+      items: [track()],
+    });
+  });
+
+  it.each([
+    [
+      "valid entries",
+      { "track-id": "exact", other: "version" },
+      { inQueue: { "track-id": "exact", other: "version" } },
+    ],
+    [
+      "only the valid entries",
+      { "track-id": "exact", bad: "queued", worse: 1 },
+      { inQueue: { "track-id": "exact" } },
+    ],
+    ["an empty object", {}, {}],
+    ["only invalid entries", { bad: "queued" }, {}],
+    ["an array", ["exact"], {}],
+    ["a string", "exact", {}],
+    ["a missing value", undefined, {}],
+  ])("parses inQueue with %s", async (_label, inQueue, expected) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse({ inQueue, items: [track()] })),
+    );
+
+    await expect(searchTracks("abba")).resolves.toEqual({
+      ...expected,
+      items: [track()],
+    });
+  });
+
+  it.each([
+    ["ALREADY_IN_QUEUE", CLIENT_MESSAGES.alreadyInQueue],
     ["INVALID_INPUT", CLIENT_MESSAGES.genericError],
     ["NO_ACTIVE_DEVICE", CLIENT_MESSAGES.noActiveDevice],
     ["RATE_LIMITED", CLIENT_MESSAGES.rateLimited],

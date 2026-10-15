@@ -23,6 +23,21 @@ interface ApiRequest {
   url: URL;
 }
 
+interface InstallOptions {
+  // Answers for GET /v1/me/player/queue. Without it, queue reads share `responses`.
+  queueReads?: Response[];
+}
+
+// The search and add routes read the queue before they act. The suites for those
+// routes set this so a queue read does not use up the responses they are testing.
+let defaultQueueReads: (() => Response[]) | undefined;
+
+function emptyQueueReads(): Response[] {
+  return Array.from({ length: 4 }, () =>
+    jsonResponse({ currently_playing: null, queue: [] }),
+  );
+}
+
 function jsonResponse(
   body: unknown,
   status = 200,
@@ -37,12 +52,18 @@ function jsonResponse(
   });
 }
 
-function installSpotifyFetch(responses: Response[]): {
+function installSpotifyFetch(
+  responses: Response[],
+  options: InstallOptions = {},
+): {
   apiRequests: ApiRequest[];
   fetchMock: ReturnType<typeof vi.fn>;
+  queueRequests: ApiRequest[];
 } {
   const queuedResponses = [...responses];
+  const queueReads = options.queueReads ?? defaultQueueReads?.();
   const apiRequests: ApiRequest[] = [];
+  const queueRequests: ApiRequest[] = [];
   const fetchMock = vi.fn(
     async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       const url =
@@ -60,6 +81,21 @@ function installSpotifyFetch(responses: Response[]): {
         });
       }
 
+      const isQueueRead =
+        url.pathname === "/v1/me/player/queue" &&
+        (init?.method ?? "GET") === "GET";
+
+      if (queueReads && isQueueRead) {
+        queueRequests.push({ init, url });
+        const queueResponse = queueReads.shift();
+
+        if (!queueResponse) {
+          throw new Error("Unexpected Spotify queue read.");
+        }
+
+        return queueResponse;
+      }
+
       apiRequests.push({ init, url });
       const response = queuedResponses.shift();
 
@@ -73,7 +109,7 @@ function installSpotifyFetch(responses: Response[]): {
 
   vi.stubGlobal("fetch", fetchMock);
 
-  return { apiRequests, fetchMock };
+  return { apiRequests, fetchMock, queueRequests };
 }
 
 function searchRequest(query?: string): Request {
@@ -155,6 +191,7 @@ beforeEach(() => {
   vi.stubEnv("SPOTIFY_CLIENT_ID", TEST_CLIENT_ID);
   vi.stubEnv("SPOTIFY_CLIENT_SECRET", TEST_CLIENT_SECRET);
   vi.stubEnv("SPOTIFY_REFRESH_TOKEN", TEST_REFRESH_TOKEN);
+  vi.stubEnv("TYPESAFE_API_KEY", "");
   vi.stubGlobal(
     "fetch",
     vi.fn(async () => {
@@ -166,12 +203,16 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  defaultQueueReads = undefined;
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
 describe("GET /api/search", () => {
+  beforeEach(() => {
+    defaultQueueReads = emptyQueueReads;
+  });
   it.each([
     ["missing", undefined],
     ["short", "abc"],
@@ -308,6 +349,40 @@ describe("GET /api/search", () => {
     expect(await response.json()).toEqual({ items: [] });
   });
 
+  it("flags a track that is already in the queue and reads the queue once", async () => {
+    const track = validSearchTrack();
+    const { queueRequests } = installSpotifyFetch(
+      [jsonResponse({ tracks: { items: [track] } })],
+      {
+        queueReads: [
+          jsonResponse({
+            currently_playing: { ...queueSample.queue[0], id: track.id },
+            queue: [],
+          }),
+        ],
+      },
+    );
+
+    const response = await searchGet(searchRequest("Song"));
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.inQueue).toEqual({ [track.id]: "exact" });
+    expect(body.items).toHaveLength(1);
+    expect(queueRequests).toHaveLength(1);
+  });
+
+  it("returns the search result without hints when the queue read fails", async () => {
+    installSpotifyFetch([jsonResponse({ tracks: { items: [] } })], {
+      queueReads: [jsonResponse({ error: { message: "private" } }, 500)],
+    });
+
+    const response = await searchGet(searchRequest("none"));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ items: [] });
+  });
+
   it("does not cache failed Spotify searches", async () => {
     const { apiRequests } = installSpotifyFetch([
       jsonResponse({ error: { message: "private upstream message" } }, 500),
@@ -371,6 +446,10 @@ describe("GET /api/search", () => {
 });
 
 describe("POST /api/queue", () => {
+  beforeEach(() => {
+    defaultQueueReads = emptyQueueReads;
+  });
+
   it("adds a valid track URI without a body or device_id", async () => {
     const { apiRequests } = installSpotifyFetch([
       new Response(null, { status: 204 }),
@@ -404,6 +483,89 @@ describe("POST /api/queue", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
+  });
+
+  describe("duplicate check", () => {
+    const VALID_TRACK_ID = VALID_TRACK_URI.slice("spotify:track:".length);
+
+    function queueWith(nowPlayingId: string, ...queuedIds: string[]): Response {
+      const template = queueSample.queue[0];
+      const withId = (id: string) => ({ ...template, id });
+
+      // Spotify reports an empty queue when nothing is playing, so a playing track is required.
+      return jsonResponse({
+        currently_playing: withId(nowPlayingId),
+        queue: queuedIds.map(withId),
+      });
+    }
+
+    it("reads the queue first, then adds a track that is not queued", async () => {
+      const { apiRequests, queueRequests } = installSpotifyFetch(
+        [new Response(null, { status: 204 })],
+        { queueReads: [queueWith("other-playing", "other-queued")] },
+      );
+
+      const response = await queuePost(
+        queuePostRequest(JSON.stringify({ uri: VALID_TRACK_URI })),
+      );
+
+      expect(response.status).toBe(200);
+      expect(queueRequests).toHaveLength(1);
+      expect(apiRequests).toHaveLength(1);
+      expect(apiRequests[0]?.init?.method).toBe("POST");
+    });
+
+    it.each([
+      ["queued", queueWith("playing-id", "other", VALID_TRACK_ID)],
+      ["playing", queueWith(VALID_TRACK_ID, "other")],
+    ])("returns 409 without adding a track that is already %s", async (_label, queueRead) => {
+      const { apiRequests } = installSpotifyFetch([], {
+        queueReads: [queueRead],
+      });
+
+      const response = await queuePost(
+        queuePostRequest(JSON.stringify({ uri: VALID_TRACK_URI })),
+      );
+
+      expect(response.status).toBe(409);
+      expect(await response.json()).toEqual({
+        error: {
+          code: "ALREADY_IN_QUEUE",
+          message: "Essa música já está na fila",
+        },
+      });
+      expect(apiRequests).toHaveLength(0);
+    });
+
+    it("fails open and still adds when the queue read fails", async () => {
+      const { apiRequests } = installSpotifyFetch(
+        [new Response(null, { status: 204 })],
+        {
+          queueReads: [
+            jsonResponse({ error: { message: "private" } }, 500),
+          ],
+        },
+      );
+
+      const response = await queuePost(
+        queuePostRequest(JSON.stringify({ uri: VALID_TRACK_URI })),
+      );
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ ok: true });
+      expect(apiRequests).toHaveLength(1);
+    });
+
+    it("does not read the queue for an invalid URI", async () => {
+      const { queueRequests } = installSpotifyFetch([]);
+
+      const response = await queuePost(
+        queuePostRequest(JSON.stringify({ uri: "spotify:track:short" })),
+      );
+
+      expect(response.status).toBe(400);
+      expect(queueRequests).toHaveLength(0);
+    });
   });
 
   it("rejects a body above the limit when Content-Length is too large", async () => {
