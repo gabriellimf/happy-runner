@@ -1,3 +1,5 @@
+import { CheckIcon } from "./icons";
+
 export type StatusKind =
   | "empty"
   | "error"
@@ -17,18 +19,37 @@ interface StatusMessageProps {
   message: StatusMessageValue | null;
 }
 
+function ErrorGlyph() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="size-4 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.75}
+      viewBox="0 0 24 24"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v5" />
+      <path d="M12 16h.01" />
+    </svg>
+  );
+}
+
 function messageClassName(kind: StatusKind, fading: boolean): string {
   switch (kind) {
     case "empty":
-      return "text-sm text-zinc-300";
+      return "text-meta text-ink-2";
     case "error":
-      return "rounded-xl border border-red-900 bg-red-950/60 p-3 text-sm text-red-300";
+      return "flex items-center gap-2 rounded-row bg-danger-bg p-4 text-meta text-danger-ink";
     case "hint":
       return "text-sm text-zinc-400";
     case "loading":
       return "sr-only";
     case "success":
-      return `rounded-xl border border-emerald-900 bg-emerald-950/50 p-3 text-sm text-emerald-300 motion-safe:transition-opacity duration-150 ${
+      return `flex items-center gap-2 rounded-row bg-success-bg px-4 py-3 text-meta text-success-ink motion-safe:animate-notice-in motion-safe:transition-opacity duration-150 ${
         fading ? "opacity-0" : "opacity-100"
       }`;
     case "warning":
@@ -63,6 +84,9 @@ export function StatusMessage({
         id="search-status"
         role="status"
       >
+        {visibleMessage && message.kind === "success" ? (
+          <CheckIcon className="size-4 shrink-0" />
+        ) : null}
         {statusText}
       </p>
       <p
@@ -73,10 +97,11 @@ export function StatusMessage({
         id="search-alert"
         role="alert"
       >
+        {isError ? <ErrorGlyph /> : null}
         {alertText}
       </p>
       {isError ? (
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-meta text-ink-2">
           Você ainda pode apertar Enter para tentar de novo.
         </p>
       ) : null}

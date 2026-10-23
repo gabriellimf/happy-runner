@@ -1,5 +1,6 @@
 import type { InQueue, InQueueKind, Track } from "../lib/spotify-responses";
 import type { SearchPhase } from "../lib/client/search-machine";
+import { PlusIcon } from "./icons";
 import { TrackRow } from "./track-row";
 
 const QUEUE_BADGES: Record<InQueueKind, string> = {
@@ -22,12 +23,12 @@ function SuggestionSkeleton() {
   return (
     <li
       aria-hidden="true"
-      className="grid min-h-16 grid-cols-[3rem_minmax(0,1fr)] items-center gap-3 rounded-xl bg-zinc-900 p-2 motion-safe:animate-pulse"
+      className="grid min-h-[72px] grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-3 rounded-row bg-surface px-3 py-2 motion-safe:animate-pulse"
     >
-      <span className="size-12 rounded-lg bg-zinc-800" />
+      <span className="size-14 rounded-chip bg-surface-3" />
       <span className="min-w-0 space-y-2">
-        <span className="block h-4 w-3/4 rounded bg-zinc-800" />
-        <span className="block h-3 w-1/2 rounded bg-zinc-800" />
+        <span className="block h-4 w-3/4 rounded bg-surface-3" />
+        <span className="block h-3 w-1/2 rounded bg-surface-3" />
       </span>
     </li>
   );
@@ -53,27 +54,52 @@ export function SuggestionList({
   return (
     <div className="space-y-2">
       <ul aria-label="Sugestões" className="space-y-2">
-        {items.slice(0, 5).map((track, index) => (
-          <li key={track.id}>
-            <button
-              aria-busy={activeTrackId === track.id || undefined}
-              className={`min-h-16 w-full rounded-xl bg-zinc-900 p-2 text-left focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 active:scale-[0.98] active:bg-zinc-800 motion-safe:transition-transform duration-100 touch-manipulation ${
-                index === 0 ? "border-l-2 border-emerald-400" : ""
-              } ${isAdding ? "opacity-60" : ""}`}
-              disabled={isAdding}
-              onClick={() => onSelect(track)}
-              type="button"
+        {items.slice(0, 5).map((track, index) => {
+          const isBusyRow = activeTrackId === track.id;
+          return (
+            <li
+              className="motion-safe:animate-rise-in"
+              key={track.id}
+              style={{ animationDelay: `${index * 40}ms` }}
             >
-              <span className="sr-only">Adicionar </span>
-              <TrackRow track={track} />
-              {inQueue?.[track.id] ? (
-                <span className="mt-1 ml-15 block text-xs text-amber-300">
-                  {QUEUE_BADGES[inQueue[track.id]]}
+              <button
+                aria-busy={isBusyRow || undefined}
+                className={`flex min-h-[72px] w-full items-center gap-3 rounded-row bg-surface px-3 py-2 text-left touch-manipulation focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base active:bg-surface-2 motion-safe:active:scale-[0.98] motion-safe:transition-transform duration-100 ${
+                  index === 0 ? "ring-1 ring-accent" : ""
+                } ${isAdding ? "opacity-60" : ""}`}
+                disabled={isAdding}
+                onClick={() => onSelect(track)}
+                type="button"
+              >
+                <span className="sr-only">Adicionar </span>
+                <span className="min-w-0 flex-1">
+                  <TrackRow coverSize="small" track={track} />
+                  {inQueue?.[track.id] ? (
+                    <span className="mt-1 ml-[68px] block rounded-pill bg-surface-3 px-2 py-0.5 text-caption text-warn-ink">
+                      {QUEUE_BADGES[inQueue[track.id]]}
+                    </span>
+                  ) : null}
                 </span>
-              ) : null}
-            </button>
-          </li>
-        ))}
+                <span
+                  aria-hidden="true"
+                  className={
+                    isBusyRow
+                      ? "flex size-11 shrink-0 items-center justify-center rounded-pill ring-1 ring-inset ring-accent"
+                      : index === 0
+                        ? "flex size-11 shrink-0 items-center justify-center rounded-pill bg-accent text-body font-semibold text-on-accent"
+                        : "flex size-11 shrink-0 items-center justify-center rounded-pill bg-surface-3 text-ink"
+                  }
+                >
+                  {isBusyRow
+                    ? null
+                    : index === 0
+                      ? "↵"
+                      : <PlusIcon className="size-5" />}
+                </span>
+              </button>
+            </li>
+          );
+        })}
         {isLoading && !hasSuggestions
           ? Array.from({ length: 3 }, (_, index) => (
               <SuggestionSkeleton key={`search-skeleton-${index}`} />
@@ -81,7 +107,7 @@ export function SuggestionList({
           : null}
       </ul>
       {phase === "results" && resultQuery === query ? (
-        <p className="px-1 text-sm text-zinc-400">
+        <p className="px-1 text-meta text-ink-2">
           Enter adiciona a primeira. Toque em outra para escolher.
         </p>
       ) : null}

@@ -5,6 +5,9 @@ import { describe, expect, it, vi } from "vitest";
 import HomePage from "../app/page";
 import RootLayout, { metadata, viewport } from "../app/layout";
 
+vi.mock("next/font/google", () => ({
+  Outfit: () => ({ variable: "font-outfit-test" }),
+}));
 vi.mock("../app/globals.css", () => ({}));
 
 describe("app shell", () => {
@@ -13,7 +16,8 @@ describe("app shell", () => {
       createElement(RootLayout, null, createElement(HomePage)),
     );
 
-    expect(markup).toContain('<html lang="pt-BR">');
+    expect(markup).toContain('lang="pt-BR"');
+    expect(markup).toContain("font-outfit-test");
     expect(markup).toContain('aria-label="Página inicial"');
     expect(metadata.title).toBe("Happy Runner");
     expect(viewport).toMatchObject({

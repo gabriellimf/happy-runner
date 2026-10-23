@@ -9,21 +9,24 @@ interface TrackRowProps {
   track: TrackDisplay;
 }
 
+const COLUMN_CLASSES = {
+  large: "grid-cols-[8rem_minmax(0,1fr)]",
+  mini: "grid-cols-[3rem_minmax(0,1fr)]",
+  small: "grid-cols-[3.5rem_minmax(0,1fr)]",
+} as const;
+
 export function TrackRow({ coverSize = "small", track }: TrackRowProps) {
   const isLarge = coverSize === "large";
-  const columnsClass = isLarge
-    ? "grid-cols-[6rem_minmax(0,1fr)]"
-    : "grid-cols-[3rem_minmax(0,1fr)]";
-  const titleClass = isLarge ? "line-clamp-2" : "truncate";
+  const titleClass = isLarge
+    ? "line-clamp-2 text-hero text-ink"
+    : "truncate text-body text-ink";
 
   return (
-    <div className={`grid ${columnsClass} min-w-0 items-center gap-3`}>
+    <div className={`grid ${COLUMN_CLASSES[coverSize]} min-w-0 items-center gap-3`}>
       <Cover coverUrl={track.coverUrl} size={coverSize} />
       <span className="min-w-0">
-        <span className={`block ${titleClass} text-base font-medium`}>
-          {track.title}
-        </span>
-        <span className="block truncate text-sm text-zinc-400">
+        <span className={`block ${titleClass}`}>{track.title}</span>
+        <span className="block truncate text-meta text-ink-2">
           {track.artists.join(", ")}
         </span>
       </span>

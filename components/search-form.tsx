@@ -32,7 +32,7 @@ export function SearchForm({
         autoComplete="off"
         autoCorrect="off"
         autoFocus
-        className="h-14 min-w-0 flex-1 scroll-mt-4 rounded-xl border border-zinc-700 bg-zinc-900 px-4 text-lg text-zinc-100 outline-none placeholder:text-zinc-500 focus-visible:ring-3 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+        className="h-14 min-w-0 flex-1 scroll-mt-4 rounded-pill border border-field-edge bg-surface-2 px-5 text-input text-ink outline-none placeholder:text-ink-3 focus-visible:ring-3 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
         enterKeyHint="send"
         id="music-search"
         inputMode="search"
@@ -48,10 +48,12 @@ export function SearchForm({
       <button
         aria-busy={isAdding || undefined}
         aria-disabled={isDisabled}
-        className={`h-14 min-w-[88px] shrink-0 whitespace-nowrap rounded-xl px-3 text-sm font-semibold touch-manipulation active:scale-[0.98] motion-safe:transition-transform duration-100 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 ${
-          isDisabled
-            ? "bg-zinc-800 text-zinc-400"
-            : "bg-emerald-400 text-zinc-950"
+        className={`h-14 min-w-[112px] shrink-0 whitespace-nowrap rounded-pill px-5 text-body touch-manipulation motion-safe:active:scale-[0.97] motion-safe:transition-transform duration-100 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base ${
+          isAdding
+            ? "bg-accent text-on-accent opacity-80"
+            : isDisabled
+              ? "bg-surface-3 text-ink-3"
+              : "bg-accent text-on-accent"
         }`}
         type="submit"
       >
