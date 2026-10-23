@@ -1,3 +1,5 @@
+export const MAX_SEARCH_RESULTS = 5;
+
 export interface Track {
   id: string;
   uri: string;
@@ -139,7 +141,7 @@ export function parseSpotifySearchResults(value: unknown): Track[] {
 
   const tracks: Track[] = [];
 
-  for (const item of value.tracks.items) {
+  for (const item of value.tracks.items.slice(0, MAX_SEARCH_RESULTS)) {
     const track = parseSearchTrack(item);
 
     if (track) {

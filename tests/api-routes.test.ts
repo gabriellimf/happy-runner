@@ -531,14 +531,102 @@ describe("POST /api/queue", () => {
       expect(await response.json()).toEqual({
         error: {
           code: "ALREADY_IN_QUEUE",
-          message: "Essa música já está na fila",
+          message:
+            "Essa música já está na fila. Enter de novo para adicionar.",
         },
       });
       expect(apiRequests).toHaveLength(0);
     });
 
-    it("fails open and still adds when the queue read fails", async () => {
-      const { apiRequests } = installSpotifyFetch(
+    it("checks the copy limit before rejecting a duplicate", async () => {
+      const { apiRequests } = installSpotifyFetch([], {
+        queueReads: [
+          queueWith("other-playing", VALID_TRACK_ID, VALID_TRACK_ID),
+        ],
+      });
+
+      const response = await queuePost(
+        queuePostRequest(JSON.stringify({ uri: VALID_TRACK_URI })),
+      );
+
+      expect(response.status).toBe(409);
+      expect(await response.json()).toEqual({
+        error: {
+          code: "TRACK_COPY_LIMIT",
+          message:
+            "Essa música já está na fila duas vezes. Não pode ser adicionada de novo.",
+        },
+      });
+      expect(apiRequests).toHaveLength(0);
+    });
+
+    it("allows the second queued copy when force is true", async () => {
+      const { apiRequests, queueRequests } = installSpotifyFetch(
+        [new Response(null, { status: 204 })],
+        { queueReads: [queueWith("other-playing", VALID_TRACK_ID)] },
+      );
+
+      const response = await queuePost(
+        queuePostRequest(
+          JSON.stringify({ uri: VALID_TRACK_URI, force: true }),
+        ),
+      );
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ ok: true });
+      expect(queueRequests).toHaveLength(1);
+      expect(apiRequests).toHaveLength(1);
+      expect(apiRequests[0]?.init?.method).toBe("POST");
+    });
+
+    it("refuses a third copy with force using the full upcoming queue", async () => {
+      const otherIds = Array.from({ length: 12 }, (_, index) => `other-${index}`);
+      const { apiRequests, queueRequests } = installSpotifyFetch([], {
+        queueReads: [
+          queueWith(
+            "other-playing",
+            ...otherIds,
+            VALID_TRACK_ID,
+            VALID_TRACK_ID,
+          ),
+        ],
+      });
+
+      const response = await queuePost(
+        queuePostRequest(
+          JSON.stringify({ uri: VALID_TRACK_URI, force: true }),
+        ),
+      );
+
+      expect(response.status).toBe(409);
+      expect(await response.json()).toEqual({
+        error: {
+          code: "TRACK_COPY_LIMIT",
+          message:
+            "Essa música já está na fila duas vezes. Não pode ser adicionada de novo.",
+        },
+      });
+      expect(queueRequests).toHaveLength(1);
+      expect(apiRequests).toHaveLength(0);
+    });
+
+    it("still blocks duplicates when force is false", async () => {
+      const { apiRequests } = installSpotifyFetch([], {
+        queueReads: [queueWith(VALID_TRACK_ID)],
+      });
+
+      const response = await queuePost(
+        queuePostRequest(
+          JSON.stringify({ uri: VALID_TRACK_URI, force: false }),
+        ),
+      );
+
+      expect(response.status).toBe(409);
+      expect(apiRequests).toHaveLength(0);
+    });
+
+    it("still adds when the queue read fails", async () => {
+      const { apiRequests, queueRequests } = installSpotifyFetch(
         [new Response(null, { status: 204 })],
         {
           queueReads: [
@@ -553,7 +641,32 @@ describe("POST /api/queue", () => {
 
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({ ok: true });
+      expect(queueRequests).toHaveLength(1);
       expect(apiRequests).toHaveLength(1);
+      expect(apiRequests[0]?.init?.method).toBe("POST");
+    });
+
+    it("skips the copy cap when the queue response is invalid JSON", async () => {
+      const { apiRequests, queueRequests } = installSpotifyFetch(
+        [new Response(null, { status: 204 })],
+        {
+          queueReads: [
+            new Response("not json", {
+              headers: { "Content-Type": "application/json" },
+            }),
+          ],
+        },
+      );
+
+      const response = await queuePost(
+        queuePostRequest(JSON.stringify({ uri: VALID_TRACK_URI })),
+      );
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ ok: true });
+      expect(queueRequests).toHaveLength(1);
+      expect(apiRequests).toHaveLength(1);
+      expect(apiRequests[0]?.init?.method).toBe("POST");
     });
 
     it("does not read the queue for an invalid URI", async () => {
@@ -654,6 +767,28 @@ describe("POST /api/queue", () => {
       error: {
         code: "INVALID_INPUT",
         message: "URI de música inválida",
+      },
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["a string", "true"],
+    ["a number", 1],
+    ["null", null],
+    ["an array", []],
+  ])("rejects force when it is %s", async (_label, force) => {
+    installSpotifyFetch([]);
+
+    const response = await queuePost(
+      queuePostRequest(JSON.stringify({ uri: VALID_TRACK_URI, force })),
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      error: {
+        code: "INVALID_INPUT",
+        message: "Solicitação inválida",
       },
     });
     expect(fetch).not.toHaveBeenCalled();

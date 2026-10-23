@@ -8,6 +8,7 @@ import {
   searchTracks,
 } from "../lib/client/api";
 import { CLIENT_MESSAGES, getClientErrorMessage } from "../lib/client/errors";
+import { MAX_SEARCH_RESULTS } from "../lib/spotify-responses";
 import type { Track } from "../lib/spotify-responses";
 
 function jsonResponse(
@@ -64,6 +65,41 @@ describe("client API", () => {
       "/api/queue",
       expect.objectContaining({ cache: "no-store", method: "GET" }),
     ]);
+  });
+
+  it("sends force only when explicitly requested for a queue add", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ ok: true }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await addTrack(track().uri, true);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/queue",
+      expect.objectContaining({
+        body: JSON.stringify({ uri: track().uri, force: true }),
+        method: "POST",
+      }),
+    );
+  });
+
+  it("caps search results from the API response", async () => {
+    const items = Array.from({ length: MAX_SEARCH_RESULTS + 2 }, (_, index) => ({
+      ...track(),
+      id: `track-${index}`,
+    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse({ items })),
+    );
+
+    const response = await searchTracks("abba");
+
+    expect(response.items).toHaveLength(MAX_SEARCH_RESULTS);
+    expect(response.items.map(({ id }) => id)).toEqual(
+      items.slice(0, MAX_SEARCH_RESULTS).map(({ id }) => id),
+    );
   });
 
   it.each([
@@ -125,6 +161,14 @@ describe("client API", () => {
     const error = new ClientApiError(500, code, undefined);
 
     expect(getClientErrorMessage(error, true)).toBe(message);
+  });
+
+  it("maps TRACK_COPY_LIMIT to its terminal pt-BR message", () => {
+    const error = new ClientApiError(409, "TRACK_COPY_LIMIT", undefined);
+
+    expect(getClientErrorMessage(error, true)).toBe(
+      CLIENT_MESSAGES.trackCopyLimit,
+    );
   });
 
   it("maps a non-JSON API error body to the generic message", async () => {

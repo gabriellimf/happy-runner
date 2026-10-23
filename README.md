@@ -41,8 +41,8 @@ Without the key, or when TypeSafe fails or times out (2 seconds, no retry), the 
 
 ## Duplicates
 
-- Exact: code compares the Spotify track id with the playing and queued tracks. `POST /api/queue` returns 409 `ALREADY_IN_QUEUE` and does not add the track. Search marks the track `"exact"`.
-- Another version: only a hint. Search marks the track `"version"`. The suggestion shows a badge. Enter does not add it and shows a message. Tapping the suggestion adds it.
+- Exact: code compares the Spotify track id with the playing and queued tracks. `POST /api/queue` returns 409 `ALREADY_IN_QUEUE` on the first add. Pressing Enter again for the same result sends `force: true` and adds it. Search marks the track `"exact"`.
+- Another version: only a hint. Search marks the track `"version"`. The suggestion shows a badge. Enter does not add it unless the query names a version. Tapping the suggestion adds it.
 - If the queue read fails, the add and the search go on without duplicate checks.
 - The queue can change between search and tap, so search hints can be out of date. Only the server check at add time is exact.
 - Two guests who add the same song at the same moment can both pass. There is no database.
@@ -51,8 +51,8 @@ Without the key, or when TypeSafe fails or times out (2 seconds, no retry), the 
 
 ## API
 
-- `GET /api/search?q=<query>` accepts 4 to 100 characters and returns `{ items: Track[], autoAddId?: string | null, inQueue?: Record<string, "exact" | "version"> }`, where `Track` is `{ id, uri, title, artists: string[], coverUrl: string | null, durationMs }`. `autoAddId` is present only when TypeSafe judged the results. A string is the track that Enter adds. `null` means no confident match, so the UI asks the guest to pick a suggestion. When it is absent, Enter adds the first item. `inQueue` maps track ids to the kind of duplicate. It is present only when at least one result matches.
-- `POST /api/queue` accepts `{ uri: "spotify:track:..." }` and returns `{ ok: true }`. It returns 409 when the track is playing or already queued.
+- `GET /api/search?q=<query>` accepts 4 to 100 characters and returns `{ items: Track[], autoAddId?: string | null, inQueue?: Record<string, "exact" | "version"> }`, where `Track` is `{ id, uri, title, artists: string[], coverUrl: string | null, durationMs }`. `autoAddId` is present only when TypeSafe judged the results. A string is the track that Enter adds. `null` means no confident match, so Enter adds the first item. When it is absent, TypeSafe did not judge and Enter also adds the first item. `inQueue` maps track ids to the kind of duplicate. It is present only when at least one result matches.
+- `POST /api/queue` accepts `{ uri: "spotify:track:...", force?: boolean }` and returns `{ ok: true }`. It returns 409 when the track is playing or already queued unless `force` is `true`.
 - `GET /api/queue` returns `{ nowPlaying: QueueTrack | null, next: QueueTrack[] }`, where `QueueTrack` is `{ id, title, artists: string[], coverUrl: string | null }`. It sets `Cache-Control: no-store`.
 - Errors use `{ error: { code, message } }`: `INVALID_INPUT` (400), `ALREADY_IN_QUEUE` (409), `NO_ACTIVE_DEVICE` (503), `RATE_LIMITED` (429), `UPSTREAM_ERROR` (502), or `INTERNAL_ERROR` (500).
 

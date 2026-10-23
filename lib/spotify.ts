@@ -2,6 +2,7 @@ import { Buffer } from "node:buffer";
 
 import { createSearchCache } from "./search-cache";
 import {
+  MAX_SEARCH_RESULTS,
   parseSpotifyQueue,
   parseSpotifySearchResults,
 } from "./spotify-responses";
@@ -609,7 +610,7 @@ export async function search(query: string): Promise<Track[]> {
 
   const response = await request<unknown>("search", {
     query: {
-      limit: 5,
+      limit: MAX_SEARCH_RESULTS,
       market: "BR",
       q: trimmedQuery,
       type: "track",

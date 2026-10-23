@@ -76,10 +76,14 @@ Guest phone --> Next.js on Vercel (API routes) --> Spotify Web API
 | Route | Method | Spotify call | Notes |
 |---|---|---|---|
 | `/api/search?q=` | GET | `GET /v1/search?type=track&market=BR&limit=5` and `GET /v1/me/player/queue` | Reject `q` shorter than 4 characters. Cache the search by normalized query in memory (short TTL). The queue read is not cached. It marks results that are already in the queue (`inQueue`). |
-| `/api/queue` | POST | `GET /v1/me/player/queue`, then `POST /v1/me/player/queue?uri=` | Body: `{ uri }`. Returns 409 `ALREADY_IN_QUEUE` when the track id is playing or queued. If the queue read fails, the add goes on. Maps Spotify errors to messages (see Errors). |
-| `/api/queue` | GET | `GET /v1/me/player/queue` | Returns "now playing" plus next items. |
+| `/api/queue` | POST | `GET /v1/me/player/queue`, then `POST /v1/me/player/queue?uri=` | Body: `{ uri, force? }`. Returns 409 `ALREADY_IN_QUEUE` when the track id is playing or queued, unless `force` is `true`, and 409 `TRACK_COPY_LIMIT` when it already appears twice in the upcoming queue. If the queue read fails, the copy cap and duplicate warning are skipped, and the add proceeds. Maps Spotify errors to messages (see Errors). |
+| `/api/queue` | GET | `GET /v1/me/player/queue` | Returns "now playing" plus next items. Non-track items are omitted. |
 
 Never expose the access token or refresh token to the client.
+
+The server applies a best-effort limit of at most two copies per track in the upcoming queue; concurrent adds can exceed it because the check is read-then-add. `force` cannot bypass that cap. The server cannot tie `force` to a prior 409, so any caller can send it; the duplicate guard is a convenience, not a security control.
+
+Failing both checks open when the queue read fails is a deliberate availability trade for a live party. Per-guest rate limiting, tracked separately as #20, is the control against flooding.
 
 ## UI behavior
 
@@ -87,7 +91,9 @@ Never expose the access token or refresh token to the client.
 - Typing: debounce about 300 ms. Search starts at 4 characters or more. Show up to 5 suggestions with cover, title, and artist.
 - Enter (or the add button) adds the first result. This is the main fast path.
 - Tapping a suggestion adds that track.
-- A suggestion that is already in the queue shows the badge "Já na fila". One that is another version of a queued song shows "Versão na fila". On Enter, a "Versão na fila" track is not added and a hint explains why. Tapping it adds it.
+- A suggestion that is already in the queue shows the badge "Já na fila". If fewer than two upcoming copies exist, the first Enter asks for confirmation and the next adds one more; at the two-copy cap, the server refuses, and a new search or changed input clears the confirmation.
+- A suggestion that is another version of a queued song shows "Versão na fila". On Enter, it is not added unless the guest explicitly requested a version. Tapping it adds it.
+- Known limitation: bare `live` and `cover` also match titles such as "Live Forever" and "Cover Me". This favors allowing a requested version, because a false positive only hides a warning badge while a false negative can block an add.
 - After a successful add: clear the input, show a short confirmation, refresh the queue.
 - Below the input: "Tocando agora" and the next items. Poll `GET /api/queue` every about 5 s. Pause polling when the tab is hidden.
 - Cancel the previous in-flight search when the user types again.
@@ -99,7 +105,8 @@ Never expose the access token or refresh token to the client.
 | No active device | 404 `NO_ACTIVE_DEVICE` | "Player offline, tente em instantes" |
 | Rate limit or quota | 429 (honor `Retry-After`) | "Muita gente pedindo, tente de novo" |
 | No search result | empty list | "Nenhuma música encontrada" |
-| Track already playing or queued | server check, 409 `ALREADY_IN_QUEUE` | "Essa música já está na fila" |
+| Track already playing or queued | server check, 409 `ALREADY_IN_QUEUE` | "Essa música já está na fila. Enter de novo para adicionar." |
+| Track already queued twice | server check, 409 `TRACK_COPY_LIMIT` | "Essa música já está na fila duas vezes. Não pode ser adicionada de novo." |
 | Other | 5xx or unknown | "Algo deu errado, tente de novo" |
 
 Note: Spike #3 did not reproduce the 404 `NO_ACTIVE_DEVICE` signal. `add` returned 200 with Spotify closed on every device. See #13.

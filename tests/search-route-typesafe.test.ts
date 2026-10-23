@@ -95,6 +95,7 @@ describe("GET /api/search with TypeSafe checks", () => {
     const response = await searchGet(request("  faixa  "));
 
     expect(await response.json()).toEqual({ items: ITEMS });
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(judgeSearch).toHaveBeenCalledWith("faixa", ITEMS, EMPTY_QUEUE);
   });
 
@@ -120,6 +121,18 @@ describe("GET /api/search with TypeSafe checks", () => {
     const response = await searchGet(request("faixa"));
 
     expect(await response.json()).toEqual({ items: ITEMS, autoAddId: null });
+  });
+
+  it("returns search items when the judgment promise rejects", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(judgeSearch).mockRejectedValue(new Error("private failure"));
+
+    const response = await searchGet(request("faixa"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(await response.json()).toEqual({ items: ITEMS });
+    consoleError.mockRestore();
   });
 });
 
