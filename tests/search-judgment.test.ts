@@ -9,6 +9,10 @@ import {
 import type { QueueResponse, Track } from "../lib/spotify-responses";
 import { MAX_SEARCH_RESULTS } from "../lib/spotify-responses";
 import {
+  INTENT_PICK_CACHE_TTL_MS,
+  SEARCH_CACHE_TTL_MS,
+} from "../lib/search-cache";
+import {
   getTypeSafeClient,
   isTypeSafeCircuitOpen,
   logTypeSafeError,
@@ -344,6 +348,30 @@ describe("judgeSearch", () => {
       await judgeSearch(" evidencias ", TRACKS, emptyQueue);
 
       expect(systemOne).toHaveBeenCalledOnce();
+    });
+
+    it("still answers intent and pick from cache after the short search TTL", async () => {
+      vi.useFakeTimers();
+
+      try {
+        answerWith(["song", 0.99], ["c2", 0.97]);
+        const emptyQueue: QueueResponse = { nowPlaying: null, next: [] };
+
+        await judgeSearch("evidencias", TRACKS, emptyQueue);
+        expect(systemOne).toHaveBeenCalledOnce();
+
+        vi.advanceTimersByTime(SEARCH_CACHE_TTL_MS + 1);
+        await judgeSearch("evidencias", TRACKS, emptyQueue);
+
+        expect(systemOne).toHaveBeenCalledOnce();
+
+        vi.advanceTimersByTime(INTENT_PICK_CACHE_TTL_MS);
+        await judgeSearch("evidencias", TRACKS, emptyQueue);
+
+        expect(systemOne).toHaveBeenCalledTimes(2);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("keys cached similar answers by queue state", async () => {

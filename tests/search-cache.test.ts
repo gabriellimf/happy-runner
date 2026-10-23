@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   createSearchCache,
+  INTENT_PICK_CACHE_TTL_MS,
   SEARCH_CACHE_MAX_ENTRIES,
   SEARCH_CACHE_TTL_MS,
 } from "../lib/search-cache";
@@ -17,6 +18,26 @@ describe("search cache", () => {
     now += SEARCH_CACHE_TTL_MS;
     expect(cache.get("query")).toBeUndefined();
     expect(cache.size).toBe(0);
+  });
+
+  it("honours a longer TTL when one is given", () => {
+    let now = 1_000;
+    const cache = createSearchCache<string>(
+      () => now,
+      INTENT_PICK_CACHE_TTL_MS,
+    );
+
+    cache.set("query", "judgment");
+
+    now += SEARCH_CACHE_TTL_MS;
+    expect(cache.get("query")).toBe("judgment");
+
+    now += INTENT_PICK_CACHE_TTL_MS;
+    expect(cache.get("query")).toBeUndefined();
+  });
+
+  it("keeps the intent and pick lifetime longer than the queue-bound one", () => {
+    expect(INTENT_PICK_CACHE_TTL_MS).toBeGreaterThan(SEARCH_CACHE_TTL_MS);
   });
 
   it("evicts the oldest entry when the cache reaches its cap", () => {
