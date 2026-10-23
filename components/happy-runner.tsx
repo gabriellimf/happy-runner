@@ -13,6 +13,7 @@ import { SearchForm } from "./search-form";
 import type { StatusMessageValue } from "./status-message";
 import { StatusMessage } from "./status-message";
 import { SuggestionList } from "./suggestion-list";
+import { useCoverAccent } from "./use-cover-accent";
 
 function getSearchMessage(
   phase: SearchPhase,
@@ -61,13 +62,18 @@ export function HappyRunner() {
         search.state.text,
         search.state.errorMessage,
       );
+  const accent = useCoverAccent(queue.state.data?.nowPlaying?.coverUrl ?? null);
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col gap-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-      <header>
-        <h1 className="text-sm font-semibold tracking-tight">Happy Runner</h1>
+    <div
+      className="accent-root relative isolate mx-auto flex min-h-dvh w-full max-w-[480px] flex-col gap-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]"
+      style={accent.style}
+    >
+      <div aria-hidden="true" className="bleed-layer" />
+      <header className="pb-2">
+        <h1 className="text-brand">Happy Runner</h1>
       </header>
-      <section aria-label="Busca de músicas" className="space-y-2">
+      <section aria-label="Busca de músicas" className="space-y-3">
         <SearchForm
           isAdding={add.state.isAdding}
           isDisabled={!isSearchQueryValid(search.state.text) || add.state.isAdding}

@@ -1,5 +1,182 @@
 @import "tailwindcss";
 
+@theme {
+  --color-base: #0a0a0b;
+  --color-surface: #141417;
+  --color-surface-2: #1c1c21;
+  --color-surface-3: #26262c;
+  --color-hairline: rgb(255 255 255 / 0.06);
+  --color-ink: #f4f4f5;
+  --color-ink-2: #b4b4be;
+  --color-ink-3: #8e8e9a;
+  --color-field-edge: #62626e;
+  --color-danger-bg: #2a1215;
+  --color-danger-ink: #fca5a5;
+  --color-success-bg: #0f2a1a;
+  --color-success-ink: #86efac;
+  --color-warn-ink: #fcd34d;
+  --color-accent-fallback: #c6f432;
+  --color-bleed-fallback: #2b1b6b;
+  --color-bleed-2-fallback: #4b1a66;
+  --color-on-accent: #0a0a0b;
+
+  --shadow-row: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --shadow-hero: inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 24px 40px -24px rgb(0 0 0 / 0.75);
+  --shadow-cover: 0 12px 24px -8px rgb(0 0 0 / 0.6);
+
+  --text-hero: 28px;
+  --text-hero--line-height: 32px;
+  --text-hero--font-weight: 700;
+  --text-hero--letter-spacing: -0.02em;
+
+  --text-brand: 22px;
+  --text-brand--line-height: 26px;
+  --text-brand--font-weight: 700;
+  --text-brand--letter-spacing: -0.02em;
+
+  --text-title: 20px;
+  --text-title--line-height: 24px;
+  --text-title--font-weight: 600;
+  --text-title--letter-spacing: -0.01em;
+
+  --text-input: 18px;
+  --text-input--line-height: 24px;
+  --text-input--font-weight: 500;
+  --text-input--letter-spacing: 0;
+
+  --text-body: 16px;
+  --text-body--line-height: 22px;
+  --text-body--font-weight: 500;
+  --text-body--letter-spacing: 0;
+
+  --text-meta: 14px;
+  --text-meta--line-height: 20px;
+  --text-meta--font-weight: 400;
+  --text-meta--letter-spacing: 0;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 600;
+  --text-caption--letter-spacing: 0.01em;
+
+  --radius-chip: 12px;
+  --radius-row: 16px;
+  --radius-card: 24px;
+  --radius-pill: 9999px;
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-rise-in: rise-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-cover-in: cover-in 240ms ease-out both;
+  --animate-notice-in: notice-in 180ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-bleed: var(--bleed);
+  --color-bleed-2: var(--bleed-2);
+}
+
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c6f432;
+}
+
+@property --bleed {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2b1b6b;
+}
+
+@property --bleed-2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #4b1a66;
+}
+
 :root {
   color-scheme: dark;
+  --accent: #c6f432;
+  --bleed: #2b1b6b;
+  --bleed-2: #4b1a66;
+}
+
+html {
+  background: var(--color-base);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .accent-root {
+    transition:
+      --accent 400ms cubic-bezier(0.16, 1, 0.3, 1),
+      --bleed 600ms cubic-bezier(0.16, 1, 0.3, 1),
+      --bleed-2 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+.bleed-layer {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 680px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 140px,
+    var(--bleed) 300px,
+    transparent 680px
+  );
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cover-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in,
+  .animate-cover-in,
+  .animate-notice-in {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 2px;
+  }
 }
