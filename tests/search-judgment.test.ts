@@ -1,12 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { judgeSearch } from "../lib/search-judgment";
+import { APIError, APITimeoutError } from "@typesafe-ai/sdk";
+
+import {
+  judgeSearch,
+  resetSearchJudgmentCaches,
+} from "../lib/search-judgment";
 import type { QueueResponse, Track } from "../lib/spotify-responses";
-import { getTypeSafeClient, logTypeSafeError } from "../lib/typesafe";
+import { MAX_SEARCH_RESULTS } from "../lib/spotify-responses";
+import {
+  getTypeSafeClient,
+  isTypeSafeCircuitOpen,
+  logTypeSafeError,
+  recordTypeSafeFailure,
+  recordTypeSafeSuccess,
+} from "../lib/typesafe";
 
 vi.mock("../lib/typesafe", () => ({
   getTypeSafeClient: vi.fn(),
+  isTypeSafeCircuitOpen: vi.fn(),
   logTypeSafeError: vi.fn(),
+  recordTypeSafeFailure: vi.fn(),
+  recordTypeSafeSuccess: vi.fn(),
 }));
 
 const systemOne = vi.fn();
@@ -59,7 +74,9 @@ function queueOf(...ids: string[]): QueueResponse {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  resetSearchJudgmentCaches();
   vi.mocked(getTypeSafeClient).mockReturnValue({ systemOne } as never);
+  vi.mocked(isTypeSafeCircuitOpen).mockReturnValue(false);
 });
 
 describe("judgeSearch", () => {
@@ -78,6 +95,32 @@ describe("judgeSearch", () => {
       blocked: false,
       similarIds: [],
     });
+    expect(systemOne).not.toHaveBeenCalled();
+  });
+
+  it("fails open when TypeSafe client construction throws", async () => {
+    const failure = new Error("constructor failed");
+    vi.mocked(getTypeSafeClient).mockImplementation(() => {
+      throw failure;
+    });
+
+    await expect(judgeSearch("evidencias", TRACKS)).resolves.toEqual({
+      blocked: false,
+      similarIds: [],
+    });
+    expect(logTypeSafeError).toHaveBeenCalledWith("search-judgment", failure);
+    expect(recordTypeSafeFailure).toHaveBeenCalledOnce();
+    expect(systemOne).not.toHaveBeenCalled();
+  });
+
+  it("skips TypeSafe while the circuit breaker is open", async () => {
+    vi.mocked(isTypeSafeCircuitOpen).mockReturnValue(true);
+
+    await expect(judgeSearch("evidencias", TRACKS)).resolves.toEqual({
+      blocked: false,
+      similarIds: [],
+    });
+    expect(getTypeSafeClient).not.toHaveBeenCalled();
     expect(systemOne).not.toHaveBeenCalled();
   });
 
@@ -149,6 +192,67 @@ describe("judgeSearch", () => {
       judgeSearch("evidencias", TRACKS, queueOf("queued")),
     ).resolves.toEqual({ blocked: false, similarIds: [] });
     expect(logTypeSafeError).toHaveBeenCalledWith("search-judgment", failure);
+  });
+
+  it("fails open and logs a 400 without counting it as a service failure", async () => {
+    const failure = new APIError(
+      400,
+      { detail: "invalid question" },
+      new Headers(),
+      "Bad Request",
+    );
+    systemOne.mockRejectedValue(failure);
+
+    await expect(judgeSearch("evidencias", TRACKS)).resolves.toEqual({
+      blocked: false,
+      similarIds: [],
+    });
+    expect(recordTypeSafeFailure).toHaveBeenCalledWith(failure);
+    expect(logTypeSafeError).toHaveBeenCalledWith("search-judgment", failure);
+  });
+
+  it("fails open when the SDK request times out", async () => {
+    const failure = new APITimeoutError(2_000);
+    systemOne.mockRejectedValue(failure);
+
+    await expect(judgeSearch("timeout-case", TRACKS)).resolves.toEqual({
+      blocked: false,
+      similarIds: [],
+    });
+    expect(logTypeSafeError).toHaveBeenCalledWith("search-judgment", failure);
+  });
+
+  it.each([
+    ["an empty answers object", {}],
+    [
+      "a missing pick answer",
+      {
+        intent: { choice: "song", confidence: 0.99, type: "choice" },
+      },
+    ],
+    [
+      "a string confidence",
+      {
+        intent: { choice: "command", confidence: "1", type: "choice" },
+        pick: { choice: "c1", confidence: 0.99, type: "choice" },
+      },
+    ],
+    [
+      "a NaN confidence",
+      {
+        intent: { choice: "song", confidence: 0.99, type: "choice" },
+        pick: { choice: "c1", confidence: Number.NaN, type: "choice" },
+      },
+    ],
+  ])("fails open for %s", async (_label, answers) => {
+    systemOne.mockResolvedValue({ answers });
+
+    await expect(judgeSearch("malformed-answer", TRACKS)).resolves.toEqual({
+      blocked: false,
+      similarIds: [],
+    });
+    expect(recordTypeSafeSuccess).not.toHaveBeenCalled();
+    expect(recordTypeSafeFailure).toHaveBeenCalledOnce();
   });
 
   describe("with a queue", () => {
@@ -232,16 +336,116 @@ describe("judgeSearch", () => {
       expect(Object.keys(request.questions)).toEqual(["intent", "pick"]);
     });
 
-    it("ignores a missing similar answer", async () => {
+    it("caches intent and pick for a normalized query and empty queue", async () => {
       answerWith(["song", 0.99], ["c2", 0.97]);
+      const emptyQueue: QueueResponse = { nowPlaying: null, next: [] };
 
-      const judgment = await judgeSearch(
-        "evidencias",
-        TRACKS,
-        queueOf("queued"),
+      await judgeSearch("EVIDENCIAS", TRACKS, emptyQueue);
+      await judgeSearch(" evidencias ", TRACKS, emptyQueue);
+
+      expect(systemOne).toHaveBeenCalledOnce();
+    });
+
+    it("keys cached similar answers by queue state", async () => {
+      answerWith(["song", 0.99], ["c2", 0.97], {
+        similar_c1: 0.8,
+        similar_c2: 0.1,
+      });
+      const firstQueue = queueOf("queued-1");
+
+      await judgeSearch("evidencias", TRACKS, firstQueue);
+      await judgeSearch("evidencias", TRACKS, firstQueue);
+
+      expect(systemOne).toHaveBeenCalledOnce();
+
+      answerWith(["song", 0.99], ["c1", 0.97], {
+        similar_c1: 0.1,
+        similar_c2: 0.9,
+      });
+      const secondQueue = queueOf("queued-2");
+      const judgment = await judgeSearch("evidencias", TRACKS, secondQueue);
+
+      expect(systemOne).toHaveBeenCalledTimes(2);
+      expect(Object.keys(systemOne.mock.calls[1][0].questions)).toEqual([
+        "similar_c1",
+        "similar_c2",
+      ]);
+      expect(judgment).toEqual({
+        autoAddId: "id-2",
+        blocked: false,
+        similarIds: ["id-2"],
+      });
+    });
+
+    it("caps candidates before building any TypeSafe questions", async () => {
+      const tracks = Array.from({ length: MAX_SEARCH_RESULTS + 2 }, (_, index) =>
+        track(`candidate-${index + 1}`, `Faixa ${index + 1}`, "Artista"),
+      );
+      answerWith(["song", 0.99], [`c${MAX_SEARCH_RESULTS}`, 0.99]);
+
+      const judgment = await judgeSearch("faixas", tracks);
+      const request = systemOne.mock.calls[0][0];
+
+      expect(Object.keys(request.state.candidates)).toHaveLength(
+        MAX_SEARCH_RESULTS,
+      );
+      expect(judgment.autoAddId).toBe(tracks[MAX_SEARCH_RESULTS - 1]?.id);
+    });
+
+    it.each([
+      ["missing", { similar_c1: { noul: 0.99, type: "noul" } }],
+      [
+        "malformed",
+        {
+          similar_c1: { noul: 0.99, type: "noul" },
+          similar_c2: { noul: "0.1", type: "noul" },
+        },
+      ],
+    ])("does not cache a %s similar answer", async (_label, invalidAnswers) => {
+      answerWith(["song", 0.99], ["c2", 0.97]);
+      await judgeSearch("evidencias", TRACKS);
+
+      systemOne.mockResolvedValueOnce({ answers: invalidAnswers });
+      const queue = queueOf("queued");
+      const judgment = await judgeSearch("evidencias", TRACKS, queue);
+
+      expect(judgment).toEqual({
+        autoAddId: "id-2",
+        blocked: false,
+        similarIds: [],
+      });
+      expect(logTypeSafeError).toHaveBeenLastCalledWith(
+        "search-judgment",
+        expect.any(TypeError),
       );
 
-      expect(judgment.similarIds).toEqual([]);
+      answerWith(["song", 0.99], ["c2", 0.97], {
+        similar_c1: 0.99,
+        similar_c2: 0.1,
+      });
+      await expect(judgeSearch("evidencias", TRACKS, queue)).resolves.toEqual({
+        autoAddId: "id-2",
+        blocked: false,
+        similarIds: ["id-1"],
+      });
+      expect(systemOne).toHaveBeenCalledTimes(3);
+    });
+
+    it("keeps a cached pick when the similarity request fails", async () => {
+      answerWith(["song", 0.99], ["c2", 0.97]);
+      await judgeSearch("evidencias", TRACKS);
+
+      const failure = new APITimeoutError(2_000);
+      systemOne.mockRejectedValue(failure);
+
+      await expect(
+        judgeSearch("evidencias", TRACKS, queueOf("queued")),
+      ).resolves.toEqual({
+        autoAddId: "id-2",
+        blocked: false,
+        similarIds: [],
+      });
+      expect(logTypeSafeError).toHaveBeenCalledWith("search-judgment", failure);
     });
   });
 });

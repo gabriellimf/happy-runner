@@ -45,6 +45,12 @@ function createHarness(fetchImplementation: MockFetch) {
   return { add, fetchMock, refreshQueue, search };
 }
 
+function posts(harness: ReturnType<typeof createHarness>) {
+  return harness.fetchMock.mock.calls.filter(
+    ([, init]) => init?.method === "POST",
+  );
+}
+
 async function flushPromises(): Promise<void> {
   for (let turn = 0; turn < 10; turn += 1) {
     await Promise.resolve();
@@ -88,10 +94,35 @@ describe("add machine duplicate handling", () => {
         : searchAndAddResponse(input, init);
   }
 
-  function posts(harness: ReturnType<typeof createHarness>) {
-    return harness.fetchMock.mock.calls.filter(
-      ([, init]) => init?.method === "POST",
-    );
+  function duplicateConfirmationHarness(autoAddId: string) {
+    let postCount = 0;
+    const items = [track("auto"), track("duplicate")];
+
+    return createHarness((input, init) => {
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "ALREADY_IN_QUEUE",
+                    message: CLIENT_MESSAGES.alreadyInQueue,
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      if (String(input).startsWith("/api/search")) {
+        return Promise.resolve(jsonResponse({ autoAddId, items }));
+      }
+
+      return Promise.resolve(jsonResponse({ nowPlaying: null, next: [] }));
+    });
   }
 
   it("shows a hint and adds nothing on Enter when the first result is another version of a queued song", async () => {
@@ -132,6 +163,29 @@ describe("add machine duplicate handling", () => {
       kind: "hint",
       text: CLIENT_MESSAGES.versionInQueue,
     });
+  });
+
+  it("keeps the version warning but adds when the query names that version", async () => {
+    vi.useFakeTimers();
+    const query = "Evidências karaoke";
+    const harness = createHarness(
+      respondWith({
+        inQueue: { first: "version" },
+        items: [track("first")],
+      }),
+    );
+    await loadSearch(harness.search, query);
+
+    expect(harness.search.getSnapshot().inQueue).toEqual({
+      first: "version",
+    });
+
+    await harness.add.submit(query);
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(posts(harness)[0][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
   });
 
   it("checks the version flag of the autoAddId track, not of the first result", async () => {
@@ -180,7 +234,8 @@ describe("add machine duplicate handling", () => {
             {
               error: {
                 code: "ALREADY_IN_QUEUE",
-                message: "Essa música já está na fila",
+                message:
+                  "Essa música já está na fila. Enter de novo para adicionar.",
               },
             },
             409,
@@ -204,6 +259,375 @@ describe("add machine duplicate handling", () => {
     });
     expect(harness.search.getText()).toBe("abba");
     expect(harness.refreshQueue).not.toHaveBeenCalled();
+  });
+
+  it("adds an exact duplicate after the guest presses Enter a second time", async () => {
+    vi.useFakeTimers();
+    let postCount = 0;
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "ALREADY_IN_QUEUE",
+                    message:
+                      "Essa música já está na fila. Enter de novo para adicionar.",
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      return respondWith({
+        inQueue: { first: "exact" },
+        items: [track("first")],
+      })(input, init);
+    });
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(posts(harness)[0][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
+    expect(harness.add.getSnapshot().notice?.text).toBe(
+      CLIENT_MESSAGES.alreadyInQueue,
+    );
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(2);
+    expect(posts(harness)[1][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri, force: true }),
+    );
+    expect(harness.search.getText()).toBe("");
+    expect(harness.add.getSnapshot().notice?.text).toBe(
+      "Adicionada à fila: Faixa first",
+    );
+    expect(harness.refreshQueue).toHaveBeenCalledOnce();
+  });
+
+  it("forces the tapped duplicate when Enter would pick a different track", async () => {
+    vi.useFakeTimers();
+    const harness = duplicateConfirmationHarness("auto");
+    await loadSearch(harness.search);
+
+    await harness.add.add(track("duplicate"));
+    await harness.add.submit("abba");
+
+    expect(posts(harness).map(([, init]) => init?.body)).toEqual([
+      JSON.stringify({ uri: track("duplicate").uri }),
+      JSON.stringify({ uri: track("duplicate").uri, force: true }),
+    ]);
+  });
+
+  it("forces the tapped duplicate when Enter would pick the same track", async () => {
+    vi.useFakeTimers();
+    const harness = duplicateConfirmationHarness("duplicate");
+    await loadSearch(harness.search);
+
+    await harness.add.add(track("duplicate"));
+    await harness.add.submit("abba");
+
+    expect(posts(harness).map(([, init]) => init?.body)).toEqual([
+      JSON.stringify({ uri: track("duplicate").uri }),
+      JSON.stringify({ uri: track("duplicate").uri, force: true }),
+    ]);
+  });
+
+  it("does not force the tapped duplicate after the guest changes the text", async () => {
+    vi.useFakeTimers();
+    const harness = duplicateConfirmationHarness("auto");
+    await loadSearch(harness.search);
+
+    await harness.add.add(track("duplicate"));
+    harness.search.setText("queen");
+    harness.add.clearNotice();
+    await harness.add.submit("queen");
+
+    expect(posts(harness).map(([, init]) => init?.body)).toEqual([
+      JSON.stringify({ uri: track("duplicate").uri }),
+      JSON.stringify({ uri: track("auto").uri }),
+    ]);
+  });
+
+  it("discards a duplicate confirmation when the input is cleared", async () => {
+    vi.useFakeTimers();
+    let postCount = 0;
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "ALREADY_IN_QUEUE",
+                    message:
+                      "Essa música já está na fila. Enter de novo para adicionar.",
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      return respondWith({
+        inQueue: { first: "exact" },
+        items: [track("first")],
+      })(input, init);
+    });
+    await loadSearch(harness.search);
+    await harness.add.submit("abba");
+
+    harness.search.setText("");
+    harness.add.clearNotice();
+    harness.search.setText("abba");
+    harness.add.clearNotice();
+    await vi.advanceTimersByTimeAsync(300);
+    await flushPromises();
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(2);
+    expect(posts(harness)[1][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
+  });
+
+  it("does not carry duplicate confirmation to a different track", async () => {
+    vi.useFakeTimers();
+    let postCount = 0;
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "ALREADY_IN_QUEUE",
+                    message:
+                      "Essa música já está na fila. Enter de novo para adicionar.",
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      return searchAndAddResponse(input, init);
+    });
+    await loadSearch(harness.search);
+    await harness.add.submit("abba");
+    await harness.add.add(track("different"));
+
+    expect(posts(harness)).toHaveLength(2);
+    expect(posts(harness)[1][1]?.body).toBe(
+      JSON.stringify({ uri: track("different").uri }),
+    );
+  });
+
+  it("adds the current Enter result after a different track hits the copy limit", async () => {
+    vi.useFakeTimers();
+    let postCount = 0;
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "TRACK_COPY_LIMIT",
+                    message: CLIENT_MESSAGES.trackCopyLimit,
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      return respondWith({
+        autoAddId: "second",
+        items: [track("first"), track("second")],
+      })(input, init);
+    });
+    await loadSearch(harness.search);
+
+    await harness.add.add(track("first"));
+    await harness.add.submit("abba");
+
+    expect(posts(harness).map(([, init]) => init?.body)).toEqual([
+      JSON.stringify({ uri: track("first").uri }),
+      JSON.stringify({ uri: track("second").uri }),
+    ]);
+    expect(harness.add.getSnapshot().notice).toMatchObject({
+      kind: "success",
+      text: "Adicionada à fila: Faixa second",
+    });
+  });
+
+  it("does not retry a copy-limit refusal on repeated Enter", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        return Promise.resolve(
+          jsonResponse(
+            {
+              error: {
+                code: "TRACK_COPY_LIMIT",
+                message: CLIENT_MESSAGES.trackCopyLimit,
+              },
+            },
+            409,
+          ),
+        );
+      }
+
+      return respondWith({ items: [track("first")] })(input, init);
+    });
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(harness.add.getSnapshot().notice).toMatchObject({
+      kind: "error",
+      text: CLIENT_MESSAGES.trackCopyLimit,
+    });
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(1);
+  });
+
+  it("allows a different query after a copy-limit refusal", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        return Promise.resolve(
+          jsonResponse(
+            {
+              error: {
+                code: "TRACK_COPY_LIMIT",
+                message: CLIENT_MESSAGES.trackCopyLimit,
+              },
+            },
+            409,
+          ),
+        );
+      }
+
+      return respondWith({ items: [track("first")] })(input, init);
+    });
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+    await loadSearch(harness.search, "queen");
+    await harness.add.submit("queen");
+
+    expect(posts(harness)).toHaveLength(2);
+    expect(posts(harness)[1][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
+  });
+
+  it("allows retry after clearing a copy-limit notice for the same query", async () => {
+    vi.useFakeTimers();
+    let postCount = 0;
+    const harness = createHarness((input, init) => {
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "TRACK_COPY_LIMIT",
+                    message: CLIENT_MESSAGES.trackCopyLimit,
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      return respondWith({ items: [track("first")] })(input, init);
+    });
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+    harness.add.clearNotice();
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(2);
+    expect(posts(harness)[1][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
+    expect(harness.add.getSnapshot().notice).toMatchObject({
+      kind: "success",
+      text: "Adicionada à fila: Faixa first",
+    });
+  });
+
+  it("does not carry duplicate confirmation to a different search", async () => {
+    vi.useFakeTimers();
+    let postCount = 0;
+    const harness = createHarness((input, init) => {
+      if (String(input).startsWith("/api/search")) {
+        const query = new URL(String(input), "http://localhost").searchParams.get(
+          "q",
+        );
+        const id = query === "queen" ? "second" : "first";
+
+        return Promise.resolve(jsonResponse({ items: [track(id)] }));
+      }
+
+      if (init?.method === "POST") {
+        postCount += 1;
+
+        return Promise.resolve(
+          postCount === 1
+            ? jsonResponse(
+                {
+                  error: {
+                    code: "ALREADY_IN_QUEUE",
+                    message:
+                      "Essa música já está na fila. Enter de novo para adicionar.",
+                  },
+                },
+                409,
+              )
+            : jsonResponse({ ok: true }),
+        );
+      }
+
+      return Promise.resolve(jsonResponse({ nowPlaying: null, next: [] }));
+    });
+    await loadSearch(harness.search);
+    await harness.add.submit("abba");
+
+    await harness.add.submit("queen");
+
+    expect(posts(harness)).toHaveLength(2);
+    expect(posts(harness)[1][1]?.body).toBe(
+      JSON.stringify({ uri: track("second").uri }),
+    );
   });
 });
 
@@ -235,16 +659,38 @@ describe("add machine Enter fast path", () => {
     );
   });
 
-  it.each([
-    ["autoAddId is null", null],
-    ["autoAddId is not in the results", "missing"],
-  ])("shows a hint and adds nothing when %s", async (_label, autoAddId) => {
+  it("adds the first result when autoAddId is null", async () => {
     vi.useFakeTimers();
     const harness = createHarness((input, init) =>
       String(input).startsWith("/api/search")
         ? Promise.resolve(
             jsonResponse({
-              autoAddId,
+              autoAddId: null,
+              items: [track("first"), track("second")],
+            }),
+          )
+        : searchAndAddResponse(input, init),
+    );
+    await loadSearch(harness.search);
+
+    await harness.add.submit("abba");
+
+    expect(posts(harness)).toHaveLength(1);
+    expect(posts(harness)[0][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
+    expect(harness.add.getSnapshot().notice?.text).toBe(
+      "Adicionada à fila: Faixa first",
+    );
+  });
+
+  it("shows a hint when autoAddId is not in the results", async () => {
+    vi.useFakeTimers();
+    const harness = createHarness((input, init) =>
+      String(input).startsWith("/api/search")
+        ? Promise.resolve(
+            jsonResponse({
+              autoAddId: "missing",
               items: [track("first"), track("second")],
             }),
           )
@@ -263,7 +709,7 @@ describe("add machine Enter fast path", () => {
     expect(harness.refreshQueue).not.toHaveBeenCalled();
   });
 
-  it("shows a hint and adds nothing when the fresh search is not confident", async () => {
+  it("adds the first result when a fresh search has no confident pick", async () => {
     vi.useFakeTimers();
     const harness = createHarness((input, init) =>
       String(input).startsWith("/api/search")
@@ -276,13 +722,13 @@ describe("add machine Enter fast path", () => {
 
     await harness.add.submit("abba");
 
-    expect(
-      harness.fetchMock.mock.calls.filter(([, init]) => init?.method === "POST"),
-    ).toHaveLength(0);
-    expect(harness.add.getSnapshot()).toMatchObject({
-      isAdding: false,
-      notice: { kind: "hint", text: CLIENT_MESSAGES.pickSuggestion },
-    });
+    expect(posts(harness)).toHaveLength(1);
+    expect(posts(harness)[0][1]?.body).toBe(
+      JSON.stringify({ uri: track("first").uri }),
+    );
+    expect(harness.add.getSnapshot().notice?.text).toBe(
+      "Adicionada à fila: Faixa first",
+    );
   });
 
   it("adds the first current result without running another search", async () => {

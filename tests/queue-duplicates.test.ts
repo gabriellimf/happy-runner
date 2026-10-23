@@ -65,6 +65,19 @@ describe("queue duplicates", () => {
     });
   });
 
+  it("caps the next queue tracks sent to TypeSafe", () => {
+    const queue: QueueResponse = {
+      nowPlaying: null,
+      next: Array.from({ length: 12 }, (_, index) =>
+        queueTrack(`next-${index + 1}`),
+      ),
+    };
+
+    expect(queueState(queue).next).toHaveLength(10);
+    expect(queueState(queue).next[0]?.title).toBe("Faixa next-1");
+    expect(queueState(queue).next[9]?.title).toBe("Faixa next-10");
+  });
+
   it("builds one noul per candidate that is not an exact match", () => {
     const idsByKey = new Map([
       ["c1", "a"],

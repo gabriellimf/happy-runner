@@ -2,6 +2,7 @@ import {
   alreadyInQueueResponse,
   apiErrorResponse,
   invalidInputResponse,
+  trackCopyLimitResponse,
 } from "../../../lib/api-errors";
 import {
   queuedTrackIds,
@@ -13,6 +14,7 @@ import { addToQueue, getQueue } from "../../../lib/spotify";
 const TRACK_URI_PATTERN = /^spotify:track:[A-Za-z0-9]{22}$/;
 const NO_STORE_HEADERS = { "Cache-Control": "no-store" };
 const MAX_QUEUE_REQUEST_BODY_BYTES = 1_024;
+const MAX_UPCOMING_TRACK_COPIES = 2;
 
 function trackIdFromUri(uri: string): string {
   return uri.slice("spotify:track:".length);
@@ -50,12 +52,26 @@ export async function POST(request: Request): Promise<Response> {
     return invalidInputResponse("URI de música inválida");
   }
 
-  try {
-    // Only the exact same track is blocked here. A failed queue read must not block the add.
-    const queue = await readQueueOrUndefined();
+  if ("force" in body && typeof body.force !== "boolean") {
+    return invalidInputResponse("Solicitação inválida");
+  }
 
-    if (queue && queuedTrackIds(queue).has(trackIdFromUri(body.uri))) {
-      return alreadyInQueueResponse();
+  try {
+    const queue = await readQueueOrUndefined();
+    const trackId = trackIdFromUri(body.uri);
+
+    if (queue) {
+      const copiesInUpcomingQueue = queue.next.filter(
+        (track) => track.id === trackId,
+      ).length;
+
+      if (copiesInUpcomingQueue >= MAX_UPCOMING_TRACK_COPIES) {
+        return trackCopyLimitResponse();
+      }
+
+      if (body.force !== true && queuedTrackIds(queue).has(trackId)) {
+        return alreadyInQueueResponse();
+      }
     }
 
     await addToQueue(body.uri);

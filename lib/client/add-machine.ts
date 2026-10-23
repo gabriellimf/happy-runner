@@ -1,5 +1,6 @@
+import { isExplicitVersionQuery } from "../search-terms";
 import type { Track } from "../spotify-responses";
-import { addTrack } from "./api";
+import { ClientApiError, addTrack } from "./api";
 import { CLIENT_MESSAGES, getClientErrorMessage } from "./errors";
 import {
   isSearchQueryValid,
@@ -23,7 +24,7 @@ export interface AddState {
 }
 
 interface AddMachineOptions {
-  addRequest?: (uri: string) => Promise<void>;
+  addRequest?: (uri: string, force?: boolean) => Promise<void>;
   focusInput?: () => void;
   getSearchSnapshot: () => SearchState;
   getText: () => string;
@@ -53,18 +54,23 @@ function selectAutoAddTrack(
   items: readonly Track[],
   autoAddId: string | null | undefined,
 ): Track | undefined {
-  return autoAddId === undefined
-    ? items[0]
-    : items.find((track) => track.id === autoAddId);
+  if (autoAddId === undefined || autoAddId === null) {
+    return items[0];
+  }
+
+  return items.find((track) => track.id === autoAddId);
 }
 
-// Enter must not add a track that Jev judged to be another version of a queued song.
-// Tapping the suggestion still adds it.
+// Enter warns on a queued version unless the guest explicitly requested one.
+// Tapping a suggestion still adds it.
 function isQueuedVersion(
   track: Track,
   inQueue: SearchState["inQueue"],
+  query: string,
 ): boolean {
-  return inQueue?.[track.id] === "version";
+  return (
+    inQueue?.[track.id] === "version" && !isExplicitVersionQuery(query)
+  );
 }
 
 export function createAddMachine(options: AddMachineOptions): AddMachine {
@@ -73,6 +79,11 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
   let state = INITIAL_STATE;
   let inFlight = false;
   let successTimer: ReturnType<typeof setTimeout> | null = null;
+  let pendingDuplicate:
+    | { query: string; track: Track }
+    | undefined;
+  // A copy-limit refusal stays terminal for this query; Enter cannot override it.
+  let terminalRefusal: { query: string; trackId: string } | undefined;
 
   function publish(nextState: AddState): void {
     state = nextState;
@@ -103,7 +114,43 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
 
   function clearNotice(): void {
     clearSuccessTimer();
+    pendingDuplicate = undefined;
+    terminalRefusal = undefined;
     publish({ ...state, isNoticeFading: false, notice: null });
+  }
+
+  function rememberQueueRefusal(
+    error: unknown,
+    track: Track,
+    submittedText: string,
+  ): void {
+    if (!(error instanceof ClientApiError)) {
+      return;
+    }
+
+    if (error.code === "ALREADY_IN_QUEUE") {
+      terminalRefusal = undefined;
+      pendingDuplicate = { query: submittedText, track };
+    } else if (error.code === "TRACK_COPY_LIMIT") {
+      pendingDuplicate = undefined;
+      terminalRefusal = { query: submittedText, trackId: track.id };
+    }
+  }
+
+  function consumeDuplicateConfirmation(
+    track: Track | undefined,
+    submittedText: string,
+  ): boolean {
+    const matches =
+      track !== undefined &&
+      pendingDuplicate?.track.id === track.id &&
+      pendingDuplicate.query === submittedText;
+
+    if (matches) {
+      pendingDuplicate = undefined;
+    }
+
+    return matches;
   }
 
   function showSuccess(title: string): void {
@@ -169,10 +216,20 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
     return true;
   }
 
-  async function addToQueue(track: Track, submittedText: string): Promise<void> {
+  async function addToQueue(
+    track: Track,
+    submittedText: string,
+    force = false,
+  ): Promise<void> {
     publish({ ...state, activeTrackId: track.id });
-    await addRequest(track.uri);
+    if (force) {
+      await addRequest(track.uri, true);
+    } else {
+      await addRequest(track.uri);
+    }
 
+    pendingDuplicate = undefined;
+    terminalRefusal = undefined;
     if (options.getText() === submittedText) {
       options.setText("");
     }
@@ -186,13 +243,44 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
     track: Track,
     submittedText = options.getText(),
   ): Promise<void> {
+    if (
+      terminalRefusal?.query === submittedText &&
+      terminalRefusal.trackId === track.id
+    ) {
+      return;
+    }
+
+    if (!begin(track.id)) {
+      return;
+    }
+
+    pendingDuplicate = undefined;
+    terminalRefusal = undefined;
+
+    try {
+      await addToQueue(track, submittedText);
+    } catch (error) {
+      rememberQueueRefusal(error, track, submittedText);
+      showError(error);
+    } finally {
+      inFlight = false;
+      publish({ ...state, activeTrackId: null, isAdding: false });
+    }
+  }
+
+  async function addFromSubmit(
+    track: Track,
+    submittedText: string,
+    force: boolean,
+  ): Promise<void> {
     if (!begin(track.id)) {
       return;
     }
 
     try {
-      await addToQueue(track, submittedText);
+      await addToQueue(track, submittedText, force);
     } catch (error) {
+      rememberQueueRefusal(error, track, submittedText);
       showError(error);
     } finally {
       inFlight = false;
@@ -205,7 +293,16 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
       return;
     }
 
+    if (pendingDuplicate && pendingDuplicate.query !== text) {
+      pendingDuplicate = undefined;
+    }
+    if (terminalRefusal && terminalRefusal.query !== text) {
+      terminalRefusal = undefined;
+    }
+
     if (!isSearchQueryValid(text)) {
+      pendingDuplicate = undefined;
+      terminalRefusal = undefined;
       clearSuccessTimer();
       publish({
         ...state,
@@ -219,6 +316,15 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
     const searchState = options.getSearchSnapshot();
     const currentSearch =
       searchState.query === query && searchState.resultQuery === query;
+    const hasCurrentResults =
+      currentSearch && searchState.phase === "results";
+
+    if (
+      terminalRefusal?.query === submittedText &&
+      !hasCurrentResults
+    ) {
+      return;
+    }
 
     if (currentSearch && searchState.phase === "empty") {
       clearNotice();
@@ -226,17 +332,39 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
     }
 
     if (currentSearch && searchState.phase === "results") {
+      const confirmedDuplicate =
+        pendingDuplicate?.query === submittedText ? pendingDuplicate : undefined;
+
+      if (confirmedDuplicate) {
+        const force = consumeDuplicateConfirmation(
+          confirmedDuplicate.track,
+          submittedText,
+        );
+        await addFromSubmit(confirmedDuplicate.track, submittedText, force);
+        return;
+      }
+
       const track = selectAutoAddTrack(
         searchState.items,
         searchState.autoAddId,
       );
 
+      if (
+        terminalRefusal?.query === submittedText &&
+        (!track || terminalRefusal.trackId === track.id)
+      ) {
+        return;
+      }
+
       if (!track) {
+        consumeDuplicateConfirmation(undefined, submittedText);
         showSuggestionHint();
-      } else if (isQueuedVersion(track, searchState.inQueue)) {
+      } else if (isQueuedVersion(track, searchState.inQueue, submittedText)) {
+        consumeDuplicateConfirmation(undefined, submittedText);
         showSuggestionHint(CLIENT_MESSAGES.versionInQueue);
       } else {
-        await add(track, submittedText);
+        const force = consumeDuplicateConfirmation(track, submittedText);
+        await addFromSubmit(track, submittedText, force);
       }
 
       return;
@@ -245,6 +373,10 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
     if (!begin(null)) {
       return;
     }
+
+    pendingDuplicate = undefined;
+    terminalRefusal = undefined;
+    let trackToAdd: Track | undefined;
 
     try {
       const result = await options.searchNow(query);
@@ -256,17 +388,23 @@ export function createAddMachine(options: AddMachineOptions): AddMachine {
       const track = selectAutoAddTrack(result.items, result.autoAddId);
 
       if (!track) {
+        consumeDuplicateConfirmation(undefined, submittedText);
         showSuggestionHint();
         return;
       }
 
-      if (isQueuedVersion(track, result.inQueue)) {
+      if (isQueuedVersion(track, result.inQueue, submittedText)) {
+        consumeDuplicateConfirmation(undefined, submittedText);
         showSuggestionHint(CLIENT_MESSAGES.versionInQueue);
         return;
       }
 
+      trackToAdd = track;
       await addToQueue(track, submittedText);
     } catch (error) {
+      if (trackToAdd) {
+        rememberQueueRefusal(error, trackToAdd, submittedText);
+      }
       showError(error);
     } finally {
       inFlight = false;

@@ -12,8 +12,7 @@ const RULES = [
   "If the guest typed only an artist name or a vague word, so that several different songs fit, no candidate is wanted.",
 ];
 
-// Candidates are keyed by position, so the model never sees Spotify ids.
-export function buildPickRequest(tracks: readonly Track[]) {
+function buildPickData(tracks: readonly Track[]) {
   const candidates: Record<string, { artists: string[]; title: string }> = {};
   const criteria: Record<string, string> = {};
   const idsByKey = new Map<string, string>();
@@ -27,6 +26,18 @@ export function buildPickRequest(tracks: readonly Track[]) {
   });
   criteria.none = "No candidate is the track the guest wants";
 
+  return { candidates, criteria, idsByKey };
+}
+
+// Candidates are keyed by position, so the model never sees Spotify ids.
+export function buildPickCandidates(tracks: readonly Track[]) {
+  const { candidates, idsByKey } = buildPickData(tracks);
+
+  return { candidates, idsByKey };
+}
+
+export function buildPickRequest(tracks: readonly Track[]) {
+  const { candidates, criteria, idsByKey } = buildPickData(tracks);
   const question = choice(
     {
       question:

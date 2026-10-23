@@ -4,6 +4,7 @@ import type {
   QueueTrack,
   Track,
 } from "../spotify-responses";
+import { MAX_SEARCH_RESULTS } from "../spotify-responses";
 
 export class ClientApiError extends Error {
   readonly code: string | null;
@@ -153,7 +154,7 @@ export async function searchTracks(
     throw new Error("Search response has an invalid shape");
   }
 
-  const items = body.items.filter(isTrack).slice(0, 5);
+  const items = body.items.filter(isTrack).slice(0, MAX_SEARCH_RESULTS);
   const { autoAddId } = body;
   const inQueue = parseInQueue(body.inQueue);
   const result: SearchResponse = { items };
@@ -169,11 +170,11 @@ export async function searchTracks(
   return result;
 }
 
-export async function addTrack(uri: string): Promise<void> {
+export async function addTrack(uri: string, force = false): Promise<void> {
   const response = await request("/api/queue", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ uri }),
+    body: JSON.stringify(force ? { uri, force: true } : { uri }),
   });
 
   if (!response.ok) {

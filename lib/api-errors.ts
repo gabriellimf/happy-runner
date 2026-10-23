@@ -55,7 +55,20 @@ export function alreadyInQueueResponse(): Response {
     {
       error: {
         code: "ALREADY_IN_QUEUE",
-        message: "Essa música já está na fila",
+        message: "Essa música já está na fila. Enter de novo para adicionar.",
+      },
+    },
+    { status: 409 },
+  );
+}
+
+export function trackCopyLimitResponse(): Response {
+  return Response.json(
+    {
+      error: {
+        code: "TRACK_COPY_LIMIT",
+        message:
+          "Essa música já está na fila duas vezes. Não pode ser adicionada de novo.",
       },
     },
     { status: 409 },

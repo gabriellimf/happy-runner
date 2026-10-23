@@ -11,6 +11,7 @@ import type {
 // Untuned starting point. A false warning only costs the guest an extra tap,
 // so this leans high. Check it on labeled queue cases before relying on it.
 export const SIMILAR_QUEUED_CONFIDENCE = 0.8;
+const MAX_QUEUE_STATE_NEXT_TRACKS = 10;
 
 const SIMILAR_CRITERIA = {
   true: "Another recording or version of a song in the queue. Remasters, re-releases on another album, live, acoustic, remix, karaoke, instrumental and cover versions all count.",
@@ -55,7 +56,7 @@ function summarize(track: QueueTrack): { artists: string[]; title: string } {
 export function queueState(queue: QueueResponse) {
   return {
     now_playing: queue.nowPlaying ? summarize(queue.nowPlaying) : null,
-    next: queue.next.map(summarize),
+    next: queue.next.slice(0, MAX_QUEUE_STATE_NEXT_TRACKS).map(summarize),
   };
 }
 
