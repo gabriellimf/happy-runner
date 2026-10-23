@@ -83,7 +83,21 @@ Never expose the access token or refresh token to the client.
 
 The server applies a best-effort limit of at most two copies per track in the upcoming queue; concurrent adds can exceed it because the check is read-then-add. `force` cannot bypass that cap. The server cannot tie `force` to a prior 409, so any caller can send it; the duplicate guard is a convenience, not a security control.
 
-Failing both checks open when the queue read fails is a deliberate availability trade for a live party. Per-guest rate limiting, tracked separately as #20, is the control against flooding.
+Failing both checks open when the queue read fails is a deliberate availability trade for a live party.
+
+### Search judgment caching
+
+The search route caches two kinds of answer in memory, with different lifetimes because their cache keys depend on different things.
+
+| Cache | Key | Lifetime | Why |
+|---|---|---|---|
+| Spotify search results | normalized query | 60 s | Results change as Spotify's catalogue changes, so they must stay fresh. |
+| Intent and pick judgments | normalized query plus the candidate track ids | 15 min | Neither answer depends on the queue, and any change to the candidate list already changes the key. |
+| Similar judgments | normalized query, candidate ids, and the queue state | 60 s | The answer depends on what is queued, which changes as guests add songs. |
+
+Each miss on the judgment caches costs a paid model call, so the longer intent and pick lifetime is the main lever on spend. The caches are per instance and per process. A serverless deployment runs several instances, so a cache hit is best effort and the effective saving is lower than a single-process measurement suggests.
+
+There is no per-guest rate limit. One was considered and rejected (#20): under the constraint of adding no new service, every design kept its counter in the memory of a single serverless instance, so it could not hold across instances and would have implied a protection that does not exist. A provider-side spend cap is the only control that holds across both instances and a guest clearing cookies.
 
 ## UI behavior
 

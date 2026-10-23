@@ -6,7 +6,10 @@ import {
   queuedTrackIds,
   resolveSimilarIds,
 } from "./queue-duplicates";
-import { createSearchCache } from "./search-cache";
+import {
+  INTENT_PICK_CACHE_TTL_MS,
+  createSearchCache,
+} from "./search-cache";
 import { MAX_SEARCH_RESULTS } from "./spotify-responses";
 import type { QueueResponse, Track } from "./spotify-responses";
 import {
@@ -40,7 +43,10 @@ interface CachedIntentPickJudgment {
   blocked: boolean;
 }
 
-const intentPickCache = createSearchCache<CachedIntentPickJudgment>();
+const intentPickCache = createSearchCache<CachedIntentPickJudgment>(
+  () => Date.now(),
+  INTENT_PICK_CACHE_TTL_MS,
+);
 const similarCache = createSearchCache<string[]>();
 
 function isChoiceVerdict(answer: unknown): answer is ChoiceVerdict {

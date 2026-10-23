@@ -1,4 +1,12 @@
 export const SEARCH_CACHE_TTL_MS = 60_000;
+
+// The intent and pick judgments depend only on the query text and the candidate
+// ids, both of which are already in the cache key. They do not depend on the
+// queue, so they stay valid far longer than a Spotify result list. Caching them
+// longer cuts paid TypeSafe calls when guests ask for the same songs.
+// The similar judgment keys on the queue, so it must keep the short lifetime.
+export const INTENT_PICK_CACHE_TTL_MS = 900_000;
+
 export const SEARCH_CACHE_MAX_ENTRIES = 200;
 
 interface SearchCacheEntry<T> {
@@ -6,7 +14,10 @@ interface SearchCacheEntry<T> {
   value: T;
 }
 
-export function createSearchCache<T>(now: () => number = () => Date.now()) {
+export function createSearchCache<T>(
+  now: () => number = () => Date.now(),
+  ttlMs: number = SEARCH_CACHE_TTL_MS,
+) {
   const entries = new Map<string, SearchCacheEntry<T>>();
 
   return {
@@ -30,7 +41,7 @@ export function createSearchCache<T>(now: () => number = () => Date.now()) {
     set(key: string, value: T): void {
       entries.delete(key);
       entries.set(key, {
-        expiresAt: now() + SEARCH_CACHE_TTL_MS,
+        expiresAt: now() + ttlMs,
         value,
       });
 
